@@ -11,18 +11,18 @@ import store.model.PromotionProduct;
 import store.model.Promotions;
 import store.util.FileManager;
 
-public class StoreController {
-    public void run() {
-        Products products = initialize();
-    }
+public class ProductController {
+    private static final String PROMOTION_RESOURCE_PATH = "src/main/resources/promotions.md";
+    private static final String PRODUCT_RESOURCE_PATH = "src/main/resources/products.md";
+    private static final String COLUMN_SEPARATOR = ",";
 
-    private Products initialize() {
+    public Products initialize() {
         Promotions promotions = createPromotions();
         return createProducts(promotions);
     }
 
     private Promotions createPromotions() {
-        List<String> promotionsData = loadData("src/main/resources/promotions.md");
+        List<String> promotionsData = loadData(PROMOTION_RESOURCE_PATH);
         List<Promotion> promotions = promotionsData.stream()
                 .map(this::parseData)
                 .map(PromotionBuilder::from)
@@ -38,11 +38,11 @@ public class StoreController {
     }
 
     private List<String> parseData(String rawData) {
-        return List.of(rawData.split(","));
+        return List.of(rawData.split(COLUMN_SEPARATOR));
     }
 
     private Products createProducts(Promotions promotions) {
-        List<String> productsData = loadData("src/main/resources/products.md");
+        List<String> productsData = loadData(PRODUCT_RESOURCE_PATH);
         List<ProductBuilder> builders = generateProductBuilders(productsData, promotions);
         List<Product> products = builders.stream()
                 .map(this::createProduct)

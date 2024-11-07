@@ -1,10 +1,11 @@
 package store;
 
-import store.controller.StoreController;
+import store.controller.ProductController;
+import store.model.Products;
 
 public class Application {
     public static void main(String[] args) {
-        StoreController storeController = new StoreController();
-        storeController.run();
+        ProductController productController = new ProductController();
+        Products products = productController.initialize();
     }
 }
