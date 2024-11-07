@@ -9,9 +9,7 @@ public record PromotionBuilder(String name, int buyQuantity, LocalDateTime start
     private static final int START_DATE_COLUMN = 3;
     private static final int END_DATE_COLUMN = 4;
 
-    public static PromotionBuilder from(String rawData) {
-        List<String> fields = List.of(rawData.split(","));
-
+    public static PromotionBuilder from(List<String> fields) {
         String name = fields.get(NAME_COLUMN);
         int buyQuantity = Integer.parseInt(fields.get(BUY_QUANTITY_COLUMN));
         LocalDateTime startDate = LocalDateTime.parse(fields.get(START_DATE_COLUMN));
