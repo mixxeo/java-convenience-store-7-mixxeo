@@ -28,7 +28,7 @@ public class StoreController {
 
     public void run() {
         displayProductCatalog();
-        Order order = requestOrder();
+        Order order = requestWithRetry(this::requestOrder);
     }
 
     private void displayProductCatalog() {
@@ -86,5 +86,19 @@ public class StoreController {
     private Quantity extractQuantity(Matcher matcher) {
         String quantityInput = matcher.group(QUANTITY_GROUP_INDEX);
         return Quantity.from(quantityInput);
+    }
+
+    private <T> T requestWithRetry(SupplierWithException<T> request) {
+        try {
+            return request.get();
+        } catch (IllegalArgumentException e) {
+            outputView.printMessage(e.getMessage());
+            return requestWithRetry(request);
+        }
+    }
+
+    @FunctionalInterface
+    private interface SupplierWithException<T> {
+        T get() throws IllegalArgumentException;
     }
 }

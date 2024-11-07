@@ -47,4 +47,8 @@ public class OutputView {
         System.out.println();
         System.out.println(ORDER_REQUEST_MESSAGE);
     }
+
+    public void printMessage(String message) {
+        System.out.println(message);
+    }
 }
