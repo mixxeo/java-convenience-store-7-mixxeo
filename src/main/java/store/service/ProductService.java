@@ -1,4 +1,4 @@
-package store.controller;
+package store.service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,16 +8,16 @@ import store.dto.ProductBuilder;
 import store.dto.ProductFields;
 import store.dto.PromotionBuilder;
 import store.model.Product;
-import store.model.Products;
+import store.model.ProductManager;
 import store.model.Promotion;
 import store.util.FileManager;
 
-public class ProductController {
+public class ProductService {
     private static final String PROMOTION_RESOURCE_PATH = "src/main/resources/promotions.md";
     private static final String PRODUCT_RESOURCE_PATH = "src/main/resources/products.md";
     private static final String COLUMN_SEPARATOR = ",";
 
-    public Products initialize() {
+    public ProductManager createProducts() {
         Map<String, Promotion> promotions = createPromotions();
         return createProducts(promotions);
     }
@@ -43,13 +43,13 @@ public class ProductController {
         return List.of(rawData.split(COLUMN_SEPARATOR));
     }
 
-    private Products createProducts(Map<String, Promotion> promotions) {
+    private ProductManager createProducts(Map<String, Promotion> promotions) {
         List<String> productsData = loadData(PRODUCT_RESOURCE_PATH);
         List<ProductBuilder> builders = generateProductBuilders(productsData, promotions);
         List<Product> products = builders.stream()
                 .map(Product::new)
                 .toList();
-        return new Products(products);
+        return new ProductManager(products);
     }
 
     private List<ProductBuilder> generateProductBuilders(List<String> productsData, Map<String, Promotion> promotions) {

@@ -8,8 +8,9 @@ import store.constant.ExceptionMessage;
 import store.dto.ProductInformation;
 import store.model.Order;
 import store.model.Product;
-import store.model.Products;
+import store.model.ProductManager;
 import store.model.Quantity;
+import store.service.ProductService;
 import store.view.InputView;
 import store.view.OutputView;
 
@@ -18,24 +19,25 @@ public class StoreController {
     private static final int PRODUCT_NAME_GROUP_INDEX = 1;
     private static final int QUANTITY_GROUP_INDEX = 2;
 
-    private final Products products;
+    private final ProductService productService;
     private final InputView inputView;
     private final OutputView outputView;
 
-    public StoreController(Products products, InputView inputView, OutputView outputView) {
-        this.products = products;
+    public StoreController(ProductService productService, InputView inputView, OutputView outputView) {
+        this.productService = productService;
         this.inputView = inputView;
         this.outputView = outputView;
     }
 
     public void run() {
-        displayProductCatalog();
-        Order order = requestWithRetry(this::requestOrder);
+        ProductManager productManager = productService.createProducts();
+        displayProductCatalog(productManager);
+        Order order = requestWithRetry(() -> requestOrder(productManager));
     }
 
-    private void displayProductCatalog() {
+    private void displayProductCatalog(ProductManager productManager) {
         List<ProductInformation> productInformation = new ArrayList<>();
-        for(Product product:products.products()) {
+        for(Product product: productManager.products()) {
             if (product.hasPromotion()) {
                 productInformation.add(ProductInformation.ofPromotion(product));
             }
@@ -44,54 +46,45 @@ public class StoreController {
         outputView.printProductCatalog(productInformation);
     }
 
-    private Order requestOrder() {
+    private Order requestOrder(ProductManager productManager) {
         outputView.printRequestOrder();
         String orderInput = inputView.read();
-        List<String> items = parseOrder(orderInput);
-        return createOrder(items);
+        List<String> items = List.of(orderInput.split(","));
+        return createOrder(items, productManager);
     }
 
-    private List<String> parseOrder(String orderInput) {
-        return List.of(orderInput.split(","));
-    }
-
-    private Order createOrder(List<String> items) {
+    private Order createOrder(List<String> items, ProductManager productManager) {
         Order order = new Order();
-        for(String item:items) {
-            addOrderItem(item, order);
+        for (String item : items) {
+            processOrderItem(item, order, productManager);
         }
         return order;
     }
 
-    private void addOrderItem(String item, Order order) {
+    private void processOrderItem(String item, Order order, ProductManager productManager) {
         Matcher matcher = ORDER_ITEM_PATTERN.matcher(item);
         validateOrderFormat(matcher);
-        String productName = extractProductName(matcher);
+
+        String productName = extractProductName(matcher, productManager);
         Quantity quantity = extractQuantity(matcher);
+
         order.addItem(productName, quantity);
+    }
+
+    private String extractProductName(Matcher matcher, ProductManager productManager) {
+        String productName = matcher.group(PRODUCT_NAME_GROUP_INDEX);
+        productManager.validateHasProduct(productName);
+        return productName;
+    }
+
+    private Quantity extractQuantity(Matcher matcher) {
+        return Quantity.from(matcher.group(QUANTITY_GROUP_INDEX));
     }
 
     private void validateOrderFormat(Matcher matcher) {
         if (!matcher.matches()) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_INVALID_FORMAT.getMessage());
         }
-    }
-
-    private String extractProductName(Matcher matcher) {
-        String productName = matcher.group(PRODUCT_NAME_GROUP_INDEX);
-        validateIsExistingProduct(productName);
-        return productName;
-    }
-
-    private void validateIsExistingProduct(String name) {
-        if (products.findByName(name) == null) {
-            throw new IllegalArgumentException(ExceptionMessage.ORDER_NOT_EXISTING_PRODUCT.getMessage());
-        }
-    }
-
-    private Quantity extractQuantity(Matcher matcher) {
-        String quantityInput = matcher.group(QUANTITY_GROUP_INDEX);
-        return Quantity.from(quantityInput);
     }
 
     private <T> T requestWithRetry(SupplierWithException<T> request) {
