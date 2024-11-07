@@ -1,8 +1,8 @@
 package store.dto;
 
 import java.util.List;
+import java.util.Map;
 import store.model.Promotion;
-import store.model.Promotions;
 
 public class ProductBuilder {
     private static final int NAME_COLUMN = 0;
@@ -20,11 +20,11 @@ public class ProductBuilder {
         this.stockCount = stockCount;
     }
 
-    public static ProductBuilder of(List<String> fields, Promotions promotions) {
+    public static ProductBuilder of(List<String> fields, Map<String, Promotion> promotions) {
         String name = fields.get(NAME_COLUMN);
         int price = Integer.parseInt(fields.get(PRICE_COLUMN));
         int stockCount = Integer.parseInt(fields.get(STOCK_COUNT_COLUMN));
-        Promotion promotion = promotions.findByName(fields.get(PROMOTION_COLUMN));
+        Promotion promotion = promotions.get(fields.get(PROMOTION_COLUMN));
 
         if (promotion == null) {
             return new ProductBuilder(name, price, stockCount);

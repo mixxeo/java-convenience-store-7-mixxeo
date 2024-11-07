@@ -1,6 +1,8 @@
 package store.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import store.dto.ProductBuilder;
 import store.dto.PromotionBuilder;
 import store.dto.PromotionProductBuilder;
@@ -8,7 +10,6 @@ import store.model.Product;
 import store.model.Products;
 import store.model.Promotion;
 import store.model.PromotionProduct;
-import store.model.Promotions;
 import store.util.FileManager;
 
 public class ProductController {
@@ -17,18 +18,19 @@ public class ProductController {
     private static final String COLUMN_SEPARATOR = ",";
 
     public Products initialize() {
-        Promotions promotions = createPromotions();
+        Map<String, Promotion> promotions = createPromotions();
         return createProducts(promotions);
     }
 
-    private Promotions createPromotions() {
+    private Map<String, Promotion>  createPromotions() {
         List<String> promotionsData = loadData(PROMOTION_RESOURCE_PATH);
-        List<Promotion> promotions = promotionsData.stream()
+        Map<String, Promotion> promotions = new HashMap<>();
+        promotionsData.stream()
                 .map(this::parseData)
                 .map(PromotionBuilder::from)
                 .map(Promotion::from)
-                .toList();
-        return new Promotions(promotions);
+                .forEach(promotion -> promotions.put(promotion.name(), promotion));
+        return promotions;
     }
 
     private List<String> loadData(String filePath) {
@@ -41,7 +43,7 @@ public class ProductController {
         return List.of(rawData.split(COLUMN_SEPARATOR));
     }
 
-    private Products createProducts(Promotions promotions) {
+    private Products createProducts(Map<String, Promotion> promotions) {
         List<String> productsData = loadData(PRODUCT_RESOURCE_PATH);
         List<ProductBuilder> builders = generateProductBuilders(productsData, promotions);
         List<Product> products = builders.stream()
@@ -50,7 +52,7 @@ public class ProductController {
         return new Products(products);
     }
 
-    private List<ProductBuilder> generateProductBuilders(List<String> productsData, Promotions promotions) {
+    private List<ProductBuilder> generateProductBuilders(List<String> productsData, Map<String, Promotion> promotions) {
         return productsData.stream()
                 .map(this::parseData)
                 .map(fields -> ProductBuilder.of(fields, promotions))
