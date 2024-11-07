@@ -1,11 +1,13 @@
 package store.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import store.constant.ExceptionMessage;
 import store.dto.ProductInformation;
 import store.model.Order;
+import store.model.Product;
 import store.model.Products;
 import store.model.Quantity;
 import store.view.InputView;
@@ -32,9 +34,13 @@ public class StoreController {
     }
 
     private void displayProductCatalog() {
-        List<ProductInformation> productInformation = products.products().stream()
-                .map(ProductInformation::from)
-                .toList();
+        List<ProductInformation> productInformation = new ArrayList<>();
+        for(Product product:products.products()) {
+            if (product.hasPromotion()) {
+                productInformation.add(ProductInformation.ofPromotion(product));
+            }
+            productInformation.add(ProductInformation.of(product));
+        }
         outputView.printProductCatalog(productInformation);
     }
 

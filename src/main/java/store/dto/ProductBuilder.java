@@ -4,43 +4,48 @@ import java.util.List;
 import java.util.Map;
 import store.model.Promotion;
 
-public class ProductBuilder {
-    private static final int NAME_COLUMN = 0;
-    private static final int PRICE_COLUMN = 1;
-    private static final int STOCK_COUNT_COLUMN = 2;
-    private static final int PROMOTION_COLUMN = 3;
+public record ProductBuilder(String name, int price, int stockCount, Promotion promotion, int promotionStockCount) {
+    public static ProductBuilder of(List<ProductFields> productFields, Map<String, Promotion> promotions) {
+        ProductFields normalFields = findProductFieldsByPromotionStatus(productFields, false);
+        ProductFields promotionFields = findProductFieldsByPromotionStatus(productFields, true);
 
-    private final String name;
-    private final int price;
-    private final int stockCount;
-
-    protected ProductBuilder(String name, int price, int stockCount) {
-        this.name = name;
-        this.price = price;
-        this.stockCount = stockCount;
-    }
-
-    public static ProductBuilder of(List<String> fields, Map<String, Promotion> promotions) {
-        String name = fields.get(NAME_COLUMN);
-        int price = Integer.parseInt(fields.get(PRICE_COLUMN));
-        int stockCount = Integer.parseInt(fields.get(STOCK_COUNT_COLUMN));
-        Promotion promotion = promotions.get(fields.get(PROMOTION_COLUMN));
-
-        if (promotion == null) {
-            return new ProductBuilder(name, price, stockCount);
+        if (promotionFields == null) {
+            return createWithoutPromotion(normalFields);
         }
-        return new PromotionProductBuilder(name, price, stockCount, promotion);
+        return createWithPromotion(normalFields, promotionFields, promotions);
     }
 
-    public String getName() {
-        return name;
+    private static ProductFields findProductFieldsByPromotionStatus(
+            List<ProductFields> productFields,
+            boolean hasPromotion
+    ) {
+        return productFields.stream()
+                .filter(fields -> fields.hasPromotion() == hasPromotion)
+                .findFirst()
+                .orElse(null);
     }
 
-    public int getPrice() {
-        return price;
+    private static ProductBuilder createWithoutPromotion(ProductFields productFields) {
+        return new ProductBuilder(
+                productFields.name(),
+                productFields.price(),
+                productFields.stockCount(),
+                null,
+                0
+        );
     }
 
-    public int getStockCount() {
-        return stockCount;
+    private static ProductBuilder createWithPromotion(
+            ProductFields normalFields,
+            ProductFields promotionFields,
+            Map<String, Promotion> promotions
+    ) {
+        return new ProductBuilder(
+                normalFields.name(),
+                normalFields.price(),
+                normalFields.stockCount(),
+                promotions.get(promotionFields.promotion()),
+                promotionFields.stockCount()
+        );
     }
 }

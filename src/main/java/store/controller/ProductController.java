@@ -3,13 +3,13 @@ package store.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import store.dto.ProductBuilder;
+import store.dto.ProductFields;
 import store.dto.PromotionBuilder;
-import store.dto.PromotionProductBuilder;
 import store.model.Product;
 import store.model.Products;
 import store.model.Promotion;
-import store.model.PromotionProduct;
 import store.util.FileManager;
 
 public class ProductController {
@@ -47,22 +47,18 @@ public class ProductController {
         List<String> productsData = loadData(PRODUCT_RESOURCE_PATH);
         List<ProductBuilder> builders = generateProductBuilders(productsData, promotions);
         List<Product> products = builders.stream()
-                .map(this::createProduct)
+                .map(Product::new)
                 .toList();
         return new Products(products);
     }
 
     private List<ProductBuilder> generateProductBuilders(List<String> productsData, Map<String, Promotion> promotions) {
-        return productsData.stream()
-                .map(this::parseData)
+        Map<String, List<ProductFields>> groupByName = productsData.stream()
+                .map(ProductFields::from)
+                .collect(Collectors.groupingBy(ProductFields::name));
+
+        return groupByName.values().stream()
                 .map(fields -> ProductBuilder.of(fields, promotions))
                 .toList();
-    }
-
-    private Product createProduct(ProductBuilder builder) {
-        if (builder instanceof PromotionProductBuilder) {
-            return new PromotionProduct((PromotionProductBuilder) builder);
-        }
-        return new Product(builder);
     }
 }
