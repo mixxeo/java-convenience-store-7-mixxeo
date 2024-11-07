@@ -9,7 +9,7 @@ public class OutputView {
     private static final String PRODUCT_FORMAT = "- %s %,d원 %s";
     private static final String PROMOTION_PRODUCT_FORMAT = PRODUCT_FORMAT + " %s";
     private static final String OUT_OF_STOCK = "재고 없음";
-    private static final String PRODUCT_QUANTITY_FORMAT = "%,d개";
+    private static final String PRODUCT_STOCK_COUNT_FORMAT = "%,d개";
     private static final String ORDER_REQUEST_MESSAGE = "구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])";
 
     public void printProductCatalog(List<ProductInformation> productInformation) {
@@ -27,20 +27,20 @@ public class OutputView {
     private String buildProductMessage(ProductInformation productInformation) {
         String name = productInformation.name();
         int price = productInformation.price();
-        String quantity = formatProductQuantity(productInformation.quantity());
+        String stockCount = formatProductStockCount(productInformation.stockCount());
         String promotionName = productInformation.promotionName();
 
         if (promotionName == null) {
-            return String.format(PRODUCT_FORMAT, name, price, quantity);
+            return String.format(PRODUCT_FORMAT, name, price, stockCount);
         }
-        return String.format(PROMOTION_PRODUCT_FORMAT, name, price, quantity, promotionName);
+        return String.format(PROMOTION_PRODUCT_FORMAT, name, price, stockCount, promotionName);
     }
 
-    private String formatProductQuantity(int quantity) {
-        if (quantity == 0) {
+    private String formatProductStockCount(int stockCount) {
+        if (stockCount == 0) {
             return OUT_OF_STOCK;
         }
-        return String.format(PRODUCT_QUANTITY_FORMAT, quantity);
+        return String.format(PRODUCT_STOCK_COUNT_FORMAT, stockCount);
     }
 
     public void printRequestOrder() {

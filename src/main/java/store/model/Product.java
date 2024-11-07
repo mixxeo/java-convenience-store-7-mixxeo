@@ -5,12 +5,12 @@ import store.dto.ProductBuilder;
 public class Product {
     private final String name;
     private final int price;
-    private final int quantity;
+    private final int stockCount;
 
     public Product(ProductBuilder builder) {
         this.name = builder.getName();
         this.price = builder.getPrice();
-        this.quantity = builder.getQuantity();
+        this.stockCount = builder.getStockCount();
     }
 
     public String getName() {
@@ -21,7 +21,7 @@ public class Product {
         return price;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getStockCount() {
+        return stockCount;
     }
 }
