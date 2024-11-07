@@ -41,11 +41,18 @@ public record ProductBuilder(String name, int price, int stockCount, Promotion p
             Map<String, Promotion> promotions
     ) {
         return new ProductBuilder(
-                normalFields.name(),
-                normalFields.price(),
-                normalFields.stockCount(),
+                promotionFields.name(),
+                promotionFields.price(),
+                selectStockCount(normalFields, promotionFields),
                 promotions.get(promotionFields.promotion()),
                 promotionFields.stockCount()
         );
+    }
+
+    private static int selectStockCount(ProductFields normalFields, ProductFields promotionFields) {
+        if (normalFields != null) {
+            return normalFields.stockCount();
+        }
+        return 0;
     }
 }

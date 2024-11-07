@@ -1,6 +1,7 @@
 package store.service;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ public class ProductService {
         return createProducts(promotions);
     }
 
-    private Map<String, Promotion>  createPromotions() {
+    private Map<String, Promotion> createPromotions() {
         List<String> promotionsData = loadData(PROMOTION_RESOURCE_PATH);
         Map<String, Promotion> promotions = new HashMap<>();
         promotionsData.stream()
@@ -52,10 +53,13 @@ public class ProductService {
         return new ProductManager(products);
     }
 
-    private List<ProductBuilder> generateProductBuilders(List<String> productsData, Map<String, Promotion> promotions) {
-        Map<String, List<ProductFields>> groupByName = productsData.stream()
+    private List<ProductBuilder> generateProductBuilders(
+            List<String> productsData,
+            Map<String, Promotion> promotions
+    ) {
+        LinkedHashMap<String, List<ProductFields>> groupByName = productsData.stream()
                 .map(ProductFields::from)
-                .collect(Collectors.groupingBy(ProductFields::name));
+                .collect(Collectors.groupingBy(ProductFields::name, LinkedHashMap::new, Collectors.toList()));
 
         return groupByName.values().stream()
                 .map(fields -> ProductBuilder.of(fields, promotions))

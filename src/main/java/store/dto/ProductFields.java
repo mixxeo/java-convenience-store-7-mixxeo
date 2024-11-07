@@ -19,6 +19,6 @@ public record ProductFields(String name, int price, int stockCount, String promo
     }
 
     public boolean hasPromotion() {
-        return promotion != null;
+        return !promotion.equals("null");
     }
 }
