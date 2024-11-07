@@ -46,14 +46,9 @@ public class StoreController {
     ) {
         Map<String, Product.Builder> productBuilderMap = new HashMap<>();
         for (String data : productsData) {
-            String[] fields = data.split(",");
-            String name = fields[0];
-            int price = Integer.parseInt(fields[1]);
-            int quantity = Integer.parseInt(fields[2]);
-            Promotion promotion = findPromotion(fields[3], promotions);
-
-            Product.Builder builder = createOrGetProductBuilder(name, price, productBuilderMap);
-            updateProductBuilder(builder, quantity, promotion);
+            List<String> fields = List.of(data.split(","));
+            Product.Builder builder = createOrGetProductBuilder(fields, productBuilderMap);
+            updateProductBuilder(builder, fields, promotions);
         }
         return productBuilderMap;
     }
@@ -65,15 +60,16 @@ public class StoreController {
                 .orElse(null);
     }
 
-    private Product.Builder createOrGetProductBuilder(
-            String name,
-            int price,
-            Map<String, Product.Builder> builderMap
-    ) {
+    private Product.Builder createOrGetProductBuilder(List<String> fields, Map<String, Product.Builder> builderMap) {
+        String name = fields.get(0);
+        int price = Integer.parseInt(fields.get(1));
         return builderMap.computeIfAbsent(name, k -> new Product.Builder().name(name).price(price));
     }
 
-    private void updateProductBuilder(Product.Builder builder, int quantity, Promotion promotion) {
+    private void updateProductBuilder(Product.Builder builder, List<String> fields, List<Promotion> promotions) {
+        Promotion promotion = findPromotion(fields.get(3), promotions);
+        int quantity = Integer.parseInt(fields.get(2));
+
         if (promotion == null) {
             builder.quantity(quantity);
             return;
