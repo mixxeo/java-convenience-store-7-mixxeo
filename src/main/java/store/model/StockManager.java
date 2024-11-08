@@ -26,12 +26,23 @@ public class StockManager {
     }
 
     public int calculateInSufficientPromotionStock(Product product, Quantity quantity) {
+        int maxAvailablePromotionStock = getMaxAvailablePromotionStock(product);
+        return Integer.max(quantity.value() - maxAvailablePromotionStock, 0);
+    }
+
+    public int calculatePromotionAppliedQuantity(Product product, Quantity quantity) {
+        Promotion promotion = product.getPromotion();
+        int maxAvailablePromotionStock = getMaxAvailablePromotionStock(product);
+        int maxPromotionAppliedQuantity = promotion.getMaxAppliedCount(quantity.value());
+        return Integer.min(maxAvailablePromotionStock, maxPromotionAppliedQuantity);
+    }
+
+    private int getMaxAvailablePromotionStock(Product product) {
         Promotion promotion = product.getPromotion();
         if (promotion == null) {
             return 0;
         }
-        int maxAvailablePromotionStock = promotion.getMaxAvailableStock(getPromotionStock(product));
-        return Integer.max(quantity.value() - maxAvailablePromotionStock, 0);
+        return promotion.getMaxAppliedCount(getPromotionStock(product));
     }
 
     public int getStock(Product product) {

@@ -16,7 +16,11 @@ public record Promotion(String name, PromotionType type, LocalDate startDate, Lo
         return type.isEligibleQuantity(quantity);
     }
 
-    public int getMaxAvailableStock(int currentStock) {
-        return type.calculateMaxAvailableStock(currentStock);
+    public int getMaxAppliedCount(int count) {
+        return type.calculateMaxAppliedCount(count);
+    }
+
+    public int getFreeQuantity(int appliedQuantity) {
+        return type.calculateFreeQuantity(appliedQuantity);
     }
 }

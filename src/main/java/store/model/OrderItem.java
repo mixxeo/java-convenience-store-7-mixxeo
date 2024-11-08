@@ -7,7 +7,7 @@ public class OrderItem {
     private final Product product;
     private Quantity quantity;
     private final Promotion promotion;
-    private final Quantity freeQuantity;
+    private Quantity freeQuantity;
 
     private OrderItem(Product product, Quantity quantity, Promotion promotion) {
         this.product = product;
@@ -43,7 +43,7 @@ public class OrderItem {
     }
 
     public void increaseQuantity() {
-        this.quantity = quantity.increase();
+        this.quantity = quantity.increase(1);
     }
 
     public void decreaseQuantity(int amount) {
@@ -52,5 +52,10 @@ public class OrderItem {
 
     public boolean hasPromotion() {
         return promotion != null;
+    }
+
+    public void setFreeQuantity(int promotionAppliedQuantity) {
+        int freeQuantity = promotion.getFreeQuantity(promotionAppliedQuantity);
+        this.freeQuantity = quantity.increase(freeQuantity);
     }
 }

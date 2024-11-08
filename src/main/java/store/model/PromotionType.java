@@ -25,8 +25,13 @@ public enum PromotionType {
         return quantity.value() % buyQuantity == buyQuantity - 1;
     }
 
-    public int calculateMaxAvailableStock(int currentStock) {
+    public int calculateMaxAppliedCount(int count) {
         int totalQuantity = buyQuantity + freeQuantity;
-        return currentStock - (currentStock % totalQuantity);
+        return count - (count % totalQuantity);
+    }
+
+    public int calculateFreeQuantity(int appliedQuantity) {
+        int totalQuantity = buyQuantity + freeQuantity;
+        return appliedQuantity / totalQuantity;
     }
 }

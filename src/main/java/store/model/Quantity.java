@@ -36,8 +36,8 @@ public record Quantity(int value) {
         }
     }
 
-    public Quantity increase() {
-        return new Quantity(value + 1);
+    public Quantity increase(int amount) {
+        return new Quantity(value + amount);
     }
 
     public Quantity decrease(int amount) {

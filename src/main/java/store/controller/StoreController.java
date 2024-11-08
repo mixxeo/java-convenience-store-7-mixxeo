@@ -5,6 +5,7 @@ import store.constant.ExceptionMessage;
 import store.dto.CatalogEntry;
 import store.model.Order;
 import store.model.OrderItem;
+import store.model.Product;
 import store.model.ProductManager;
 import store.service.OrderService;
 import store.service.ProductService;
@@ -68,15 +69,17 @@ public class StoreController {
 
         List<OrderItem> hasPromotionOrderItems = order.getHasPromotionItems();
         for (OrderItem orderItem : hasPromotionOrderItems) {
-            int inSufficientStock = productManager.getInSufficientPromotionStock(orderItem.getProductName(),
-                    orderItem.getQuantity());
+            Product product = productManager.findByName(orderItem.getProductName());
+            int inSufficientStock = productManager.getInSufficientPromotionStock(product, orderItem.getQuantity());
             if (inSufficientStock > 0) {
-                String response = requestWithRetry(
-                        () -> notifyFullPriceQuantity(orderItem.getProductName(), inSufficientStock));
+                String response = requestWithRetry(() -> notifyFullPriceQuantity(product.getName(), inSufficientStock));
                 if (response.equals("N")) {
                     orderItem.decreaseQuantity(inSufficientStock);
                 }
             }
+
+            int promotionAppliedQuantity = productManager.getPromotionAppliedQuantity(product, orderItem.getQuantity());
+            orderItem.setFreeQuantity(promotionAppliedQuantity);
         }
     }
 

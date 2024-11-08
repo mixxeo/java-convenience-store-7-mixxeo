@@ -58,8 +58,11 @@ public class ProductManager {
                 .orElse(null);
     }
 
-    public int getInSufficientPromotionStock(String productName, Quantity quantity) {
-        Product product = findByName(productName);
+    public int getInSufficientPromotionStock(Product product, Quantity quantity) {
         return stockManager.calculateInSufficientPromotionStock(product, quantity);
+    }
+
+    public int getPromotionAppliedQuantity(Product product, Quantity quantity) {
+        return stockManager.calculatePromotionAppliedQuantity(product, quantity);
     }
 }
