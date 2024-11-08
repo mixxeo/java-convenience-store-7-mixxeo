@@ -31,11 +31,16 @@ public class StoreController {
 
     public void run() {
         ProductManager productManager = productService.createProductManager();
+        processOrder(productManager);
+    }
+
+    private void processOrder(ProductManager productManager) {
         productManager.validateProductsInStock();
         displayProductCatalog(productManager);
         Order order = requestWithRetry(() -> requestOrder(productManager));
         applyPromotions(order, productManager);
         applyMembershipSale(order);
+        suggestReorder(productManager);
     }
 
     private void displayProductCatalog(ProductManager productManager) {
@@ -95,6 +100,16 @@ public class StoreController {
     private String suggestApplyingMemberShipSale() {
         outputView.printSuggestMembershipSale();
         return getYesOrNotResponse();
+    }
+
+    private void suggestReorder(ProductManager productManager) {
+        String response = requestWithRetry(() -> {
+            outputView.printSuggestReorder();
+            return getYesOrNotResponse();
+        });
+        if (response.equals("Y")) {
+            processOrder(productManager);
+        }
     }
 
     private String getYesOrNotResponse() {
