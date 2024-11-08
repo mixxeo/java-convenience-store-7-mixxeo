@@ -3,7 +3,7 @@ package store.dto;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import store.constant.PromotionType;
+import store.model.PromotionType;
 
 public record PromotionBuilder(String name, PromotionType type, LocalDate startDate, LocalDate endDate) {
     private static final int NAME_COLUMN = 0;

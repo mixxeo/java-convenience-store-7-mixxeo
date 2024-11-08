@@ -1,7 +1,6 @@
-package store.constant;
+package store.model;
 
 import java.util.Arrays;
-import store.model.Quantity;
 
 public enum PromotionType {
     BUY_ONE_GET_ONE_FREE(1),

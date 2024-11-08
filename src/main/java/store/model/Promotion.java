@@ -1,7 +1,6 @@
 package store.model;
 
 import java.time.LocalDate;
-import store.constant.PromotionType;
 import store.dto.PromotionBuilder;
 
 public record Promotion(String name, PromotionType type, LocalDate startDate, LocalDate endDate) {
