@@ -2,6 +2,7 @@ package store.model;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
+import store.dto.ReceiptEntry;
 
 public class OrderItem {
     private final Product product;
@@ -31,8 +32,20 @@ public class OrderItem {
         return this.product.getName();
     }
 
+    public int calculatePrice() {
+        return this.quantity.value() * this.product.getPrice();
+    }
+
+    public int calculateFreePrice() {
+        return this.freeQuantity.value() * this.product.getPrice();
+    }
+
     public Quantity getQuantity() {
         return this.quantity;
+    }
+
+    public Quantity getFreeQuantity() {
+        return this.freeQuantity;
     }
 
     public boolean isEligibleForPromotion() {

@@ -3,6 +3,7 @@ package store.controller;
 import java.util.List;
 import store.constant.ExceptionMessage;
 import store.dto.CatalogEntry;
+import store.dto.Receipt;
 import store.model.Order;
 import store.model.OrderItem;
 import store.model.Product;
@@ -40,7 +41,8 @@ public class StoreController {
         displayProductCatalog(productManager);
         Order order = requestWithRetry(() -> requestOrder(productManager));
         applyPromotions(order, productManager);
-        applyMembershipSale(order);
+        boolean isMembership = suggestMembershipSale();
+        generateReceipt(order, isMembership);
         suggestReorder(productManager);
     }
 
@@ -93,16 +95,12 @@ public class StoreController {
         return getYesOrNotResponse();
     }
 
-    private void applyMembershipSale(Order order) {
-        String response = requestWithRetry(this::suggestApplyingMemberShipSale);
-        if (response.equals("Y")) {
-            order.applyMembershipSale();
-        }
-    }
-
-    private String suggestApplyingMemberShipSale() {
-        outputView.printSuggestMembershipSale();
-        return getYesOrNotResponse();
+    private boolean suggestMembershipSale() {
+        String response = requestWithRetry(() -> {
+            outputView.printSuggestMembershipSale();
+            return getYesOrNotResponse();
+        });
+        return response.equals("Y");
     }
 
     private void suggestReorder(ProductManager productManager) {
@@ -125,6 +123,11 @@ public class StoreController {
         if (!input.equals("Y") && !input.equals("N")) {
             throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
         }
+    }
+
+    private void generateReceipt(Order order, boolean isMembership) {
+        Receipt receipt = orderService.generateReceipt(order, isMembership);
+        outputView.printReceipt(receipt);
     }
 
     private <T> T requestWithRetry(SupplierWithException<T> request) {

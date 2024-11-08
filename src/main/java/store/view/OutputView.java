@@ -3,6 +3,7 @@ package store.view;
 import java.util.List;
 import java.util.stream.Collectors;
 import store.dto.CatalogEntry;
+import store.dto.Receipt;
 
 public class OutputView {
     private static final String WELCOME_MESSAGE = "안녕하세요. W편의점입니다.\n현재 보유하고 있는 상품입니다.\n";
@@ -68,6 +69,12 @@ public class OutputView {
     public void printSuggestMembershipSale() {
         System.out.println();
         System.out.println(MEMBERSHIP_SALE_SUGGESTION);
+    }
+
+    public void printReceipt(Receipt receipt) {
+        System.out.println();
+        System.out.println("==============W 편의점================");
+        System.out.println("상품명\t\t수량\t금액\n");
     }
 
     public void printSuggestReorder() {

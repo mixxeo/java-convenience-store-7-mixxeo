@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import store.constant.ExceptionMessage;
+import store.dto.Receipt;
+import store.dto.ReceiptEntry;
 import store.model.Order;
 import store.model.OrderItem;
 import store.model.ProductManager;
@@ -34,5 +36,12 @@ public class OrderService {
         if (!matcher.matches()) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_INVALID_FORMAT.getMessage());
         }
+    }
+
+    public Receipt generateReceipt(Order order, boolean isMembership) {
+        List<ReceiptEntry> receiptEntries = order.items().stream()
+                .map(ReceiptEntry::from)
+                .toList();
+        return Receipt.of(receiptEntries, order, isMembership);
     }
 }
