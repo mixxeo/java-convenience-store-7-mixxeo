@@ -1,6 +1,5 @@
 package store.controller;
 
-import camp.nextstep.edu.missionutils.DateTimes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -8,6 +7,7 @@ import java.util.regex.Pattern;
 import store.constant.ExceptionMessage;
 import store.dto.CatalogEntry;
 import store.model.Order;
+import store.model.OrderItem;
 import store.model.Product;
 import store.model.ProductManager;
 import store.model.Quantity;
@@ -61,24 +61,19 @@ public class StoreController {
     }
 
     private Order createOrder(List<String> items, ProductManager productManager) {
-        Order order = new Order();
-        for (String item : items) {
-            processOrderItem(item, order, productManager);
-        }
-        return order;
+        List<OrderItem> orderItems = items.stream()
+                .map(item -> createOrderItem(item, productManager))
+                .toList();
+        return new Order(orderItems);
     }
 
-    private void processOrderItem(String item, Order order, ProductManager productManager) {
+    private OrderItem createOrderItem(String item, ProductManager productManager) {
         Matcher matcher = ORDER_ITEM_PATTERN.matcher(item);
         validateOrderFormat(matcher);
 
         String productName = matcher.group(PRODUCT_NAME_GROUP_INDEX);
         Quantity quantity = Quantity.from(matcher.group(QUANTITY_GROUP_INDEX));
-        productManager.validateHasProduct(productName);
-
-        Product product = productManager.findByName(productName);
-        productManager.validateStockAvailability(productManager.findByName(productName), quantity, DateTimes.now());
-        order.addItem(product, quantity);
+        return OrderItem.of(productName, quantity, productManager);
     }
 
     private void validateOrderFormat(Matcher matcher) {

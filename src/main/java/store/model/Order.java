@@ -1,21 +1,22 @@
 package store.model;
 
-import java.util.LinkedHashMap;
+import java.util.List;
 import store.constant.ExceptionMessage;
 
 public class Order {
-    private final LinkedHashMap<Product, Quantity> items;
-    public Order() {
-        this.items = new LinkedHashMap<>();
+    private final List<OrderItem> items;
+
+    public Order(List<OrderItem> items) {
+        validateHasDuplicated(items);
+        this.items = items;
     }
 
-    public void addItem(Product product, Quantity quantity) {
-        validateIsDuplicatedItem(product);
-        items.put(product, quantity);
-    }
-
-    private void validateIsDuplicatedItem(Product product) {
-        if (items.containsKey(product)) {
+    private void validateHasDuplicated(List<OrderItem> items) {
+        long distinctNamesCount = items.stream()
+                .map(OrderItem::getProductName)
+                .distinct()
+                .count();
+        if (items.size() != distinctNamesCount) {
             throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
         }
     }
