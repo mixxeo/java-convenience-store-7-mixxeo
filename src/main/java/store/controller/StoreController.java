@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import store.constant.ExceptionMessage;
-import store.dto.ProductInformation;
+import store.dto.CatalogEntry;
 import store.model.Order;
 import store.model.Product;
 import store.model.ProductManager;
@@ -37,20 +37,20 @@ public class StoreController {
     }
 
     private void displayProductCatalog(ProductManager productManager) {
-        List<ProductInformation> productInformation = productManager.getProducts().stream()
-                .flatMap(product -> convertToProductInformation(product, productManager).stream())
+        List<CatalogEntry> catalogEntry = productManager.getProducts().stream()
+                .flatMap(product -> convertToCatalogEntries(product, productManager).stream())
                 .toList();
-        outputView.printProductCatalog(productInformation);
+        outputView.printProductCatalog(catalogEntry);
     }
 
-    private List<ProductInformation> convertToProductInformation(Product product, ProductManager productManager) {
-        List<ProductInformation> productInformation = new ArrayList<>();
+    private List<CatalogEntry> convertToCatalogEntries(Product product, ProductManager productManager) {
+        List<CatalogEntry> catalogEntries = new ArrayList<>();
         StockManager stockManager = productManager.getStockManager();
         if (product.hasPromotion()) {
-            productInformation.add(ProductInformation.ofPromotion(product, stockManager.getPromotionStock(product)));
+            catalogEntries.add(CatalogEntry.ofPromotion(product, stockManager.getPromotionStock(product)));
         }
-        productInformation.add(ProductInformation.of(product, stockManager.getPromotionStock(product)));
-        return productInformation;
+        catalogEntries.add(CatalogEntry.of(product, stockManager.getStock(product)));
+        return catalogEntries;
     }
 
 

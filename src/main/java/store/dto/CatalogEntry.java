@@ -2,9 +2,9 @@ package store.dto;
 
 import store.model.Product;
 
-public record ProductInformation(String name, int price, int stockCount, String promotionName) {
-    public static ProductInformation of(Product product, int stockCount) {
-        return new ProductInformation(
+public record CatalogEntry(String name, int price, int stockCount, String promotionName) {
+    public static CatalogEntry of(Product product, int stockCount) {
+        return new CatalogEntry(
                 product.getName(),
                 product.getPrice(),
                 stockCount,
@@ -12,8 +12,8 @@ public record ProductInformation(String name, int price, int stockCount, String 
         );
     }
 
-    public static ProductInformation ofPromotion(Product product, int stockCount) {
-        return new ProductInformation(
+    public static CatalogEntry ofPromotion(Product product, int stockCount) {
+        return new CatalogEntry(
                 product.getName(),
                 product.getPrice(),
                 stockCount,

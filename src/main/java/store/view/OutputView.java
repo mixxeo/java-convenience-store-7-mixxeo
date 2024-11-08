@@ -2,7 +2,7 @@ package store.view;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import store.dto.ProductInformation;
+import store.dto.CatalogEntry;
 
 public class OutputView {
     private static final String WELCOME_MESSAGE = "안녕하세요. W편의점입니다.\n현재 보유하고 있는 상품입니다.\n";
@@ -12,7 +12,7 @@ public class OutputView {
     private static final String PRODUCT_STOCK_COUNT_FORMAT = "%,d개";
     private static final String ORDER_REQUEST_MESSAGE = "구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])";
 
-    public void printProductCatalog(List<ProductInformation> productInformation) {
+    public void printProductCatalog(List<CatalogEntry> productInformation) {
         printWelcomeMessage();
         String catalog = productInformation.stream()
                 .map(this::buildProductMessage)
@@ -24,11 +24,11 @@ public class OutputView {
         System.out.println(WELCOME_MESSAGE);
     }
 
-    private String buildProductMessage(ProductInformation productInformation) {
-        String name = productInformation.name();
-        int price = productInformation.price();
-        String stockCount = formatProductStockCount(productInformation.stockCount());
-        String promotionName = productInformation.promotionName();
+    private String buildProductMessage(CatalogEntry catalogEntry) {
+        String name = catalogEntry.name();
+        int price = catalogEntry.price();
+        String stockCount = formatProductStockCount(catalogEntry.stockCount());
+        String promotionName = catalogEntry.promotionName();
 
         if (promotionName == null) {
             return String.format(PRODUCT_FORMAT, name, price, stockCount);
