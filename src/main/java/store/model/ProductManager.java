@@ -25,6 +25,13 @@ public class ProductManager {
         return stockManager.getPromotionStock(product);
     }
 
+    public void validateProductsInStock() {
+        boolean allProductsOutOfStock = products.stream().allMatch(stockManager::isOutOfStock);
+        if (allProductsOutOfStock) {
+            throw new IllegalStateException();
+        }
+    }
+
     public void validateHasProduct(String name) {
         if (findByName(name) == null) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_NOT_EXISTING_PRODUCT.getMessage());

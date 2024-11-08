@@ -21,6 +21,10 @@ public class StockManager {
         return quantity.value() > totalStockCount;
     }
 
+    public boolean isOutOfStock(Product product) {
+        return getStock(product) == 0 && getPromotionStock(product) == 0;
+    }
+
     public int getStock(Product product) {
         return stock.get(product);
     }

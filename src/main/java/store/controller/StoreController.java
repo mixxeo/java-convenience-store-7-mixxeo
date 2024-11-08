@@ -31,6 +31,7 @@ public class StoreController {
 
     public void run() {
         ProductManager productManager = productService.createProductManager();
+        productManager.validateProductsInStock();
         displayProductCatalog(productManager);
         Order order = requestWithRetry(() -> requestOrder(productManager));
         applyPromotions(order);
