@@ -1,9 +1,8 @@
 package store.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import store.constant.ExceptionMessage;
 
 public class StockManager {
     private final Map<Product, Integer> stock = new HashMap<>();
@@ -14,15 +13,12 @@ public class StockManager {
         promotionStock.put(product, promotionStockCount);
     }
 
-    public void validateIsStockSufficient(Product product, Quantity quantity, LocalDateTime now) {
+    public boolean isInSufficientStock(Product product, int quantity, LocalDate date) {
         int totalStockCount = getStock(product);
-        if (product.hasInProgressPromotion(now)) {
+        if (product.hasInProgressPromotion(date)) {
             totalStockCount += getPromotionStock(product);
         }
-
-        if (quantity.value() > totalStockCount) {
-            throw new IllegalArgumentException(ExceptionMessage.ORDER_MORE_THAN_STOCK_COUNT.getMessage());
-        }
+        return quantity > totalStockCount;
     }
 
     public int getStock(Product product) {

@@ -11,7 +11,6 @@ import store.model.Order;
 import store.model.Product;
 import store.model.ProductManager;
 import store.model.Quantity;
-import store.model.StockManager;
 import store.service.ProductService;
 import store.view.InputView;
 import store.view.OutputView;
@@ -46,11 +45,10 @@ public class StoreController {
 
     private List<CatalogEntry> convertToCatalogEntries(Product product, ProductManager productManager) {
         List<CatalogEntry> catalogEntries = new ArrayList<>();
-        StockManager stockManager = productManager.getStockManager();
         if (product.hasPromotion()) {
-            catalogEntries.add(CatalogEntry.ofPromotion(product, stockManager.getPromotionStock(product)));
+            catalogEntries.add(CatalogEntry.ofPromotion(product, productManager.getPromotionStock(product)));
         }
-        catalogEntries.add(CatalogEntry.of(product, stockManager.getStock(product)));
+        catalogEntries.add(CatalogEntry.of(product, productManager.getStock(product)));
         return catalogEntries;
     }
 
@@ -79,8 +77,7 @@ public class StoreController {
         productManager.validateHasProduct(productName);
 
         Product product = productManager.findByName(productName);
-        StockManager stockManager = productManager.getStockManager();
-        stockManager.validateIsStockSufficient(productManager.findByName(productName), quantity, DateTimes.now());
+        productManager.validateStockAvailability(productManager.findByName(productName), quantity, DateTimes.now());
         order.addItem(product, quantity);
     }
 

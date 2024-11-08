@@ -1,6 +1,6 @@
 package store.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import store.dto.ProductBuilder;
 
 public class Product {
@@ -18,7 +18,7 @@ public class Product {
         return promotion != null;
     }
 
-    public boolean hasInProgressPromotion(LocalDateTime now) {
+    public boolean hasInProgressPromotion(LocalDate now) {
         if (!hasPromotion()) return false;
 
         Promotion promotion = getPromotion();
