@@ -13,7 +13,7 @@ public class OrderItem {
         this.product = product;
         this.quantity = quantity;
         this.promotion = promotion;
-        this.freeQuantity = Quantity.from("0");
+        this.freeQuantity = Quantity.createInitialQuantity();
     }
 
     public static OrderItem of(String productName, Quantity quantity, ProductManager productManager) {

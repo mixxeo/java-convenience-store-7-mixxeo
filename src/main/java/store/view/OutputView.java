@@ -27,6 +27,7 @@ public class OutputView {
     }
 
     private void printWelcomeMessage() {
+        System.out.println();
         System.out.println(WELCOME_MESSAGE);
     }
 

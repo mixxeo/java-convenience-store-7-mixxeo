@@ -5,6 +5,10 @@ import store.constant.ExceptionMessage;
 public record Quantity(int value) {
     private static final String NUMBER_PATTERN = "\\d+";
 
+    public static Quantity createInitialQuantity() {
+        return new Quantity(0);
+    }
+
     public static Quantity from(String input) {
         validateNumberFormat(input);
         validatePositiveIntegerRange(input);
