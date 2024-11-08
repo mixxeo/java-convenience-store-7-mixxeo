@@ -29,4 +29,6 @@ public record Order(List<OrderItem> items) {
                 .filter(OrderItem::hasPromotion)
                 .toList();
     }
+
+    public void applyMembershipSale() {}
 }

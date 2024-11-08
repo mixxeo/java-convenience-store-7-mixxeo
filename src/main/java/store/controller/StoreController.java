@@ -35,6 +35,7 @@ public class StoreController {
         displayProductCatalog(productManager);
         Order order = requestWithRetry(() -> requestOrder(productManager));
         applyPromotions(order, productManager);
+        applyMembershipSale(order);
     }
 
     private void displayProductCatalog(ProductManager productManager) {
@@ -81,6 +82,18 @@ public class StoreController {
 
     private String notifyFullPriceQuantity(String productName, int quantity) {
         outputView.printFullPriceQuantityNotification(productName, quantity);
+        return getYesOrNotResponse();
+    }
+
+    private void applyMembershipSale(Order order) {
+        String response = requestWithRetry(this::suggestApplyingMemberShipSale);
+        if (response.equals("Y")) {
+            order.applyMembershipSale();
+        }
+    }
+
+    private String suggestApplyingMemberShipSale() {
+        outputView.printSuggestMembershipSale();
         return getYesOrNotResponse();
     }
 
