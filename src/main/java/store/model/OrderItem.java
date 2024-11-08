@@ -21,7 +21,7 @@ public class OrderItem {
 
         productManager.validateHasProduct(productName);
         Product product = productManager.findByName(productName);
-        productManager.validateStockAvailability(productManager.findByName(productName), quantity, now);
+        productManager.validateStockAvailability(product, quantity, now);
         Promotion promotion = productManager.getInProgressPromotionOfProduct(product, now);
 
         return new OrderItem(product, quantity, promotion);
@@ -29,6 +29,10 @@ public class OrderItem {
 
     public String getProductName() {
         return this.product.getName();
+    }
+
+    public Quantity getQuantity() {
+        return this.quantity;
     }
 
     public boolean isEligibleForPromotion() {
@@ -40,5 +44,13 @@ public class OrderItem {
 
     public void increaseQuantity() {
         this.quantity = quantity.increase();
+    }
+
+    public void decreaseQuantity(int amount) {
+        this.quantity = quantity.decrease(amount);
+    }
+
+    public boolean hasPromotion() {
+        return promotion != null;
     }
 }

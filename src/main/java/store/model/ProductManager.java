@@ -57,4 +57,9 @@ public class ProductManager {
                 .findFirst()
                 .orElse(null);
     }
+
+    public int getInSufficientPromotionStock(String productName, Quantity quantity) {
+        Product product = findByName(productName);
+        return stockManager.calculateInSufficientPromotionStock(product, quantity);
+    }
 }

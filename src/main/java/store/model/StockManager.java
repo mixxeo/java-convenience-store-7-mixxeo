@@ -25,6 +25,15 @@ public class StockManager {
         return getStock(product) == 0 && getPromotionStock(product) == 0;
     }
 
+    public int calculateInSufficientPromotionStock(Product product, Quantity quantity) {
+        Promotion promotion = product.getPromotion();
+        if (promotion == null) {
+            return 0;
+        }
+        int maxAvailablePromotionStock = promotion.getMaxAvailableStock(getPromotionStock(product));
+        return Integer.max(quantity.value() - maxAvailablePromotionStock, 0);
+    }
+
     public int getStock(Product product) {
         return stock.get(product);
     }

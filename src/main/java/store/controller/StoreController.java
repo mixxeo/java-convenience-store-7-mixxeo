@@ -34,7 +34,7 @@ public class StoreController {
         productManager.validateProductsInStock();
         displayProductCatalog(productManager);
         Order order = requestWithRetry(() -> requestOrder(productManager));
-        applyPromotions(order);
+        applyPromotions(order, productManager);
     }
 
     private void displayProductCatalog(ProductManager productManager) {
@@ -51,18 +51,40 @@ public class StoreController {
         return orderService.createOrder(items, productManager);
     }
 
-    private void applyPromotions(Order order) {
-        List<OrderItem> orderItems = order.findEligibleOrderItemsForPromotion();
-        for (OrderItem orderItem:orderItems) {
+    private void applyPromotions(Order order, ProductManager productManager) {
+        List<OrderItem> eligibleOrderItemsForPromotion = order.findEligibleItemsForPromotion();
+        for (OrderItem orderItem : eligibleOrderItemsForPromotion) {
             String response = requestWithRetry(() -> suggestAddingQuantityForPromotion(orderItem));
             if (response.equals("Y")) {
                 orderItem.increaseQuantity();
+            }
+        }
+
+        List<OrderItem> hasPromotionOrderItems = order.getHasPromotionItems();
+        for (OrderItem orderItem : hasPromotionOrderItems) {
+            int inSufficientStock = productManager.getInSufficientPromotionStock(orderItem.getProductName(),
+                    orderItem.getQuantity());
+            if (inSufficientStock > 0) {
+                String response = requestWithRetry(
+                        () -> notifyFullPriceQuantity(orderItem.getProductName(), inSufficientStock));
+                if (response.equals("N")) {
+                    orderItem.decreaseQuantity(inSufficientStock);
+                }
             }
         }
     }
 
     private String suggestAddingQuantityForPromotion(OrderItem orderItem) {
         outputView.printOfferFreeProduct(orderItem.getProductName());
+        return getYesOrNotResponse();
+    }
+
+    private String notifyFullPriceQuantity(String productName, int quantity) {
+        outputView.printFullPriceQuantityNotification(productName, quantity);
+        return getYesOrNotResponse();
+    }
+
+    private String getYesOrNotResponse() {
         String response = inputView.read();
         validateResponse(response);
         return response;

@@ -3,12 +3,9 @@ package store.model;
 import java.util.List;
 import store.constant.ExceptionMessage;
 
-public class Order {
-    private final List<OrderItem> items;
-
-    public Order(List<OrderItem> items) {
+public record Order(List<OrderItem> items) {
+    public Order {
         validateHasDuplicated(items);
-        this.items = items;
     }
 
     private void validateHasDuplicated(List<OrderItem> items) {
@@ -21,9 +18,15 @@ public class Order {
         }
     }
 
-    public List<OrderItem> findEligibleOrderItemsForPromotion() {
+    public List<OrderItem> findEligibleItemsForPromotion() {
         return items.stream()
                 .filter(OrderItem::isEligibleForPromotion)
+                .toList();
+    }
+
+    public List<OrderItem> getHasPromotionItems() {
+        return items.stream()
+                .filter(OrderItem::hasPromotion)
                 .toList();
     }
 }
