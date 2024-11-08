@@ -1,5 +1,6 @@
 package store.controller;
 
+import camp.nextstep.edu.missionutils.DateTimes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -73,26 +74,20 @@ public class StoreController {
         Matcher matcher = ORDER_ITEM_PATTERN.matcher(item);
         validateOrderFormat(matcher);
 
-        String productName = extractProductName(matcher, productManager);
-        Quantity quantity = extractQuantity(matcher);
+        String productName = matcher.group(PRODUCT_NAME_GROUP_INDEX);
+        Quantity quantity = Quantity.from(matcher.group(QUANTITY_GROUP_INDEX));
+        productManager.validateHasProduct(productName);
 
-        order.addItem(productName, quantity);
+        Product product = productManager.findByName(productName);
+        StockManager stockManager = productManager.getStockManager();
+        stockManager.validateIsStockSufficient(productManager.findByName(productName), quantity, DateTimes.now());
+        order.addItem(product, quantity);
     }
 
     private void validateOrderFormat(Matcher matcher) {
         if (!matcher.matches()) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_INVALID_FORMAT.getMessage());
         }
-    }
-
-    private String extractProductName(Matcher matcher, ProductManager productManager) {
-        String productName = matcher.group(PRODUCT_NAME_GROUP_INDEX);
-        productManager.validateHasProduct(productName);
-        return productName;
-    }
-
-    private Quantity extractQuantity(Matcher matcher) {
-        return Quantity.from(matcher.group(QUANTITY_GROUP_INDEX));
     }
 
     private <T> T requestWithRetry(SupplierWithException<T> request) {

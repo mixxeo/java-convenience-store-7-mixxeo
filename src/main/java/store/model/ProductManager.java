@@ -26,7 +26,7 @@ public class ProductManager {
         }
     }
 
-    private Product findByName(String name) {
+    public Product findByName(String name) {
         return products.stream()
                 .filter(product -> product.getName().equals(name))
                 .findFirst()

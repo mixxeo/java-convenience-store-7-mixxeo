@@ -35,7 +35,7 @@ public class ProductService {
         promotionsData.stream()
                 .map(this::parseData)
                 .map(PromotionBuilder::from)
-                .map(Promotion::from)
+                .map(Promotion::new)
                 .forEach(promotion -> promotions.put(promotion.name(), promotion));
         return promotions;
     }
