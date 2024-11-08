@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import store.dto.CatalogEntry;
 import store.dto.ProductBuilder;
 import store.dto.ProductFields;
 import store.dto.PromotionBuilder;
@@ -27,6 +28,15 @@ public class ProductService {
         StockManager stockManager = initializeStockManager(productFieldsByName, products);
 
         return new ProductManager(products, stockManager);
+    }
+
+    public List<CatalogEntry> convertToCatalogEntries(Product product, ProductManager productManager) {
+        List<CatalogEntry> catalogEntries = new ArrayList<>();
+        if (product.hasPromotion()) {
+            catalogEntries.add(CatalogEntry.ofPromotion(product, productManager.getPromotionStock(product)));
+        }
+        catalogEntries.add(CatalogEntry.of(product, productManager.getStock(product)));
+        return catalogEntries;
     }
 
     private Map<String, Promotion> loadPromotions() {
