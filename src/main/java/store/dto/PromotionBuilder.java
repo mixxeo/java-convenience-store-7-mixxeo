@@ -3,8 +3,9 @@ package store.dto;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import store.constant.PromotionType;
 
-public record PromotionBuilder(String name, int buyQuantity, LocalDate startDate, LocalDate endDate) {
+public record PromotionBuilder(String name, PromotionType type, LocalDate startDate, LocalDate endDate) {
     private static final int NAME_COLUMN = 0;
     private static final int BUY_QUANTITY_COLUMN = 1;
     private static final int START_DATE_COLUMN = 3;
@@ -14,10 +15,11 @@ public record PromotionBuilder(String name, int buyQuantity, LocalDate startDate
     public static PromotionBuilder from(List<String> fields) {
         String name = fields.get(NAME_COLUMN);
         int buyQuantity = Integer.parseInt(fields.get(BUY_QUANTITY_COLUMN));
+        PromotionType type = PromotionType.getType(buyQuantity);
         LocalDate startDate = convertToLocalDate(fields.get(START_DATE_COLUMN));
         LocalDate endDate = convertToLocalDate(fields.get(END_DATE_COLUMN));
 
-        return new PromotionBuilder(name, buyQuantity, startDate, endDate);
+        return new PromotionBuilder(name, type, startDate, endDate);
     }
 
     public static LocalDate convertToLocalDate(String dateString) {
