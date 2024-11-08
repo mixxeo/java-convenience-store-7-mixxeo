@@ -12,4 +12,8 @@ public record Promotion(String name, PromotionType type, LocalDate startDate, Lo
     public boolean isInProgress(LocalDate date) {
         return !date.isBefore(startDate) && !date.isAfter(endDate);
     }
+
+    public boolean isEligibleQuantity(Quantity quantity) {
+        return type.isEligibleQuantity(quantity);
+    }
 }

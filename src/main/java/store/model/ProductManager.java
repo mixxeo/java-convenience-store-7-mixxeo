@@ -1,6 +1,6 @@
 package store.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import store.constant.ExceptionMessage;
 
@@ -31,10 +31,17 @@ public class ProductManager {
         }
     }
 
-    public void validateStockAvailability(Product product, Quantity quantity, LocalDateTime now) {
-        if (stockManager.isInSufficientStock(product, quantity.value(), now.toLocalDate())) {
+    public void validateStockAvailability(Product product, Quantity quantity, LocalDate date) {
+        if (stockManager.isInSufficientStock(product, quantity, date)) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_MORE_THAN_STOCK_COUNT.getMessage());
         }
+    }
+
+    public Promotion getInProgressPromotionOfProduct(Product product, LocalDate date) {
+        if (product.hasInProgressPromotion(date)) {
+            return product.getPromotion();
+        }
+        return null;
     }
 
     public Product findByName(String name) {

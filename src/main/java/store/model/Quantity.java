@@ -35,4 +35,8 @@ public record Quantity(int value) {
             throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
         }
     }
+
+    public Quantity increase() {
+        return new Quantity(value + 1);
+    }
 }

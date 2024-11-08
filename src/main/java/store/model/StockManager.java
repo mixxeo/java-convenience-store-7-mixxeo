@@ -13,12 +13,12 @@ public class StockManager {
         promotionStock.put(product, promotionStockCount);
     }
 
-    public boolean isInSufficientStock(Product product, int quantity, LocalDate date) {
+    public boolean isInSufficientStock(Product product, Quantity quantity, LocalDate date) {
         int totalStockCount = getStock(product);
         if (product.hasInProgressPromotion(date)) {
             totalStockCount += getPromotionStock(product);
         }
-        return quantity > totalStockCount;
+        return quantity.value() > totalStockCount;
     }
 
     public int getStock(Product product) {

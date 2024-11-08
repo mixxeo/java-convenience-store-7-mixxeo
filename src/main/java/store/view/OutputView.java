@@ -11,6 +11,7 @@ public class OutputView {
     private static final String OUT_OF_STOCK = "재고 없음";
     private static final String PRODUCT_STOCK_COUNT_FORMAT = "%,d개";
     private static final String ORDER_REQUEST_MESSAGE = "구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])";
+    private static final String FREE_PRODUCT_OFFER_MESSAGE = "현재 %s은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까?%n (Y/N)";
 
     public void printProductCatalog(List<CatalogEntry> productInformation) {
         printWelcomeMessage();
@@ -46,6 +47,11 @@ public class OutputView {
     public void printRequestOrder() {
         System.out.println();
         System.out.println(ORDER_REQUEST_MESSAGE);
+    }
+
+    public void printOfferFreeProduct(String productName) {
+        System.out.println();
+        System.out.printf(FREE_PRODUCT_OFFER_MESSAGE, productName);
     }
 
     public void printMessage(String message) {

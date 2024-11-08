@@ -1,8 +1,10 @@
 package store.controller;
 
 import java.util.List;
+import store.constant.ExceptionMessage;
 import store.dto.CatalogEntry;
 import store.model.Order;
+import store.model.OrderItem;
 import store.model.ProductManager;
 import store.service.OrderService;
 import store.service.ProductService;
@@ -31,6 +33,7 @@ public class StoreController {
         ProductManager productManager = productService.createProductManager();
         displayProductCatalog(productManager);
         Order order = requestWithRetry(() -> requestOrder(productManager));
+        applyPromotions(order);
     }
 
     private void displayProductCatalog(ProductManager productManager) {
@@ -45,6 +48,29 @@ public class StoreController {
         String orderInput = inputView.read();
         List<String> items = List.of(orderInput.split(","));
         return orderService.createOrder(items, productManager);
+    }
+
+    private void applyPromotions(Order order) {
+        List<OrderItem> orderItems = order.findEligibleOrderItemsForPromotion();
+        for (OrderItem orderItem:orderItems) {
+            String response = requestWithRetry(() -> suggestAddingQuantityForPromotion(orderItem));
+            if (response.equals("Y")) {
+                orderItem.increaseQuantity();
+            }
+        }
+    }
+
+    private String suggestAddingQuantityForPromotion(OrderItem orderItem) {
+        outputView.printOfferFreeProduct(orderItem.getProductName());
+        String response = inputView.read();
+        validateResponse(response);
+        return response;
+    }
+
+    private void validateResponse(String input) {
+        if (!input.equals("Y") && !input.equals("N")) {
+            throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
+        }
     }
 
     private <T> T requestWithRetry(SupplierWithException<T> request) {

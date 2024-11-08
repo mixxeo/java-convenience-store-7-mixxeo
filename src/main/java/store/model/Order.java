@@ -20,4 +20,10 @@ public class Order {
             throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
         }
     }
+
+    public List<OrderItem> findEligibleOrderItemsForPromotion() {
+        return items.stream()
+                .filter(OrderItem::isEligibleForPromotion)
+                .toList();
+    }
 }

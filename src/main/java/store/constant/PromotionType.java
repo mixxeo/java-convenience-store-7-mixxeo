@@ -1,6 +1,7 @@
 package store.constant;
 
 import java.util.Arrays;
+import store.model.Quantity;
 
 public enum PromotionType {
     BUY_ONE_GET_ONE_FREE(1),
@@ -17,5 +18,9 @@ public enum PromotionType {
                 .filter(type -> type.buyQuantity == buyQuantity)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public boolean isEligibleQuantity(Quantity quantity) {
+        return quantity.value() % buyQuantity == buyQuantity - 1;
     }
 }
