@@ -1,5 +1,6 @@
 package store.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import store.dto.PromotionBuilder;
 import store.model.Product;
 import store.model.ProductManager;
 import store.model.Promotion;
+import store.model.StockManager;
 import store.util.FileManager;
 
 public class ProductService {
@@ -18,12 +20,16 @@ public class ProductService {
     private static final String PRODUCT_RESOURCE_PATH = "src/main/resources/products.md";
     private static final String COLUMN_SEPARATOR = ",";
 
-    public ProductManager createProducts() {
-        Map<String, Promotion> promotions = createPromotions();
-        return createProducts(promotions);
+    public ProductManager createProductManager() {
+        Map<String, Promotion> promotions = loadPromotions();
+        LinkedHashMap<String, List<ProductFields>> productFieldsByName = loadProductData();
+        List<Product> products = createProducts(productFieldsByName, promotions);
+        StockManager stockManager = initializeStockManager(productFieldsByName, products);
+
+        return new ProductManager(products, stockManager);
     }
 
-    private Map<String, Promotion> createPromotions() {
+    private Map<String, Promotion> loadPromotions() {
         List<String> promotionsData = loadData(PROMOTION_RESOURCE_PATH);
         Map<String, Promotion> promotions = new HashMap<>();
         promotionsData.stream()
@@ -32,6 +38,14 @@ public class ProductService {
                 .map(Promotion::from)
                 .forEach(promotion -> promotions.put(promotion.name(), promotion));
         return promotions;
+    }
+
+    private LinkedHashMap<String, List<ProductFields>> loadProductData() {
+        List<String> productsData = loadData(PRODUCT_RESOURCE_PATH);
+        return productsData.stream()
+                .map(this::parseData)
+                .map(ProductFields::from)
+                .collect(Collectors.groupingBy(ProductFields::name, LinkedHashMap::new, Collectors.toList()));
     }
 
     private List<String> loadData(String filePath) {
@@ -44,25 +58,55 @@ public class ProductService {
         return List.of(rawData.split(COLUMN_SEPARATOR));
     }
 
-    private ProductManager createProducts(Map<String, Promotion> promotions) {
-        List<String> productsData = loadData(PRODUCT_RESOURCE_PATH);
-        List<ProductBuilder> builders = generateProductBuilders(productsData, promotions);
-        List<Product> products = builders.stream()
-                .map(Product::new)
-                .toList();
-        return new ProductManager(products);
-    }
-
-    private List<ProductBuilder> generateProductBuilders(
-            List<String> productsData,
+    private List<Product> createProducts(
+            LinkedHashMap<String, List<ProductFields>> productFieldsByName,
             Map<String, Promotion> promotions
     ) {
-        LinkedHashMap<String, List<ProductFields>> groupByName = productsData.stream()
-                .map(ProductFields::from)
-                .collect(Collectors.groupingBy(ProductFields::name, LinkedHashMap::new, Collectors.toList()));
-
-        return groupByName.values().stream()
-                .map(fields -> ProductBuilder.of(fields, promotions))
+        return productFieldsByName.values().stream()
+                .map(fields -> generateProductBuilder(fields, promotions))
+                .map(Product::new)
                 .toList();
+    }
+
+    private ProductBuilder generateProductBuilder(List<ProductFields> fields, Map<String, Promotion> promotions) {
+        ProductFields normalFields = findProductFieldsByPromotionStatus(fields, false);
+        ProductFields promotionFields = findProductFieldsByPromotionStatus(fields, true);
+
+        if (promotionFields == null) {
+            return ProductBuilder.createWithoutPromotion(normalFields);
+        }
+        return ProductBuilder.createWithPromotion(promotionFields, promotions);
+    }
+
+    private StockManager initializeStockManager(
+            LinkedHashMap<String, List<ProductFields>> productFieldsByName,
+            List<Product> products
+    ) {
+        StockManager stockManager = new StockManager();
+        for (Product product : products) {
+            List<ProductFields> fields = productFieldsByName.get(product.getName());
+            int stockCount = getStockCount(fields, false);
+            int promotionStockCount = getStockCount(fields, true);
+            stockManager.addStock(product, stockCount, promotionStockCount);
+        }
+        return stockManager;
+    }
+
+    private int getStockCount(List<ProductFields> fields, boolean isPromotion) {
+        ProductFields field = findProductFieldsByPromotionStatus(fields, isPromotion);
+        if (field == null) {
+            return 0;
+        }
+        return field.stockCount();
+    }
+
+    private static ProductFields findProductFieldsByPromotionStatus(
+            List<ProductFields> productFields,
+            boolean hasPromotion
+    ) {
+        return productFields.stream()
+                .filter(fields -> fields.hasPromotion() == hasPromotion)
+                .findFirst()
+                .orElse(null);
     }
 }

@@ -10,6 +10,7 @@ import store.model.Order;
 import store.model.Product;
 import store.model.ProductManager;
 import store.model.Quantity;
+import store.model.StockManager;
 import store.service.ProductService;
 import store.view.InputView;
 import store.view.OutputView;
@@ -30,21 +31,28 @@ public class StoreController {
     }
 
     public void run() {
-        ProductManager productManager = productService.createProducts();
+        ProductManager productManager = productService.createProductManager();
         displayProductCatalog(productManager);
         Order order = requestWithRetry(() -> requestOrder(productManager));
     }
 
     private void displayProductCatalog(ProductManager productManager) {
-        List<ProductInformation> productInformation = new ArrayList<>();
-        for(Product product: productManager.products()) {
-            if (product.hasPromotion()) {
-                productInformation.add(ProductInformation.ofPromotion(product));
-            }
-            productInformation.add(ProductInformation.of(product));
-        }
+        List<ProductInformation> productInformation = productManager.getProducts().stream()
+                .flatMap(product -> convertToProductInformation(product, productManager).stream())
+                .toList();
         outputView.printProductCatalog(productInformation);
     }
+
+    private List<ProductInformation> convertToProductInformation(Product product, ProductManager productManager) {
+        List<ProductInformation> productInformation = new ArrayList<>();
+        StockManager stockManager = productManager.getStockManager();
+        if (product.hasPromotion()) {
+            productInformation.add(ProductInformation.ofPromotion(product, stockManager.getPromotionStock(product)));
+        }
+        productInformation.add(ProductInformation.of(product, stockManager.getPromotionStock(product)));
+        return productInformation;
+    }
+
 
     private Order requestOrder(ProductManager productManager) {
         outputView.printRequestOrder();
@@ -71,6 +79,12 @@ public class StoreController {
         order.addItem(productName, quantity);
     }
 
+    private void validateOrderFormat(Matcher matcher) {
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException(ExceptionMessage.ORDER_INVALID_FORMAT.getMessage());
+        }
+    }
+
     private String extractProductName(Matcher matcher, ProductManager productManager) {
         String productName = matcher.group(PRODUCT_NAME_GROUP_INDEX);
         productManager.validateHasProduct(productName);
@@ -79,12 +93,6 @@ public class StoreController {
 
     private Quantity extractQuantity(Matcher matcher) {
         return Quantity.from(matcher.group(QUANTITY_GROUP_INDEX));
-    }
-
-    private void validateOrderFormat(Matcher matcher) {
-        if (!matcher.matches()) {
-            throw new IllegalArgumentException(ExceptionMessage.ORDER_INVALID_FORMAT.getMessage());
-        }
     }
 
     private <T> T requestWithRetry(SupplierWithException<T> request) {

@@ -8,8 +8,7 @@ public record ProductFields(String name, int price, int stockCount, String promo
     private static final int STOCK_COUNT_COLUMN = 2;
     private static final int PROMOTION_COLUMN = 3;
 
-    public static ProductFields from(String rawData) {
-        List<String> fields = List.of(rawData.split(","));
+    public static ProductFields from(List<String> fields) {
         String name = fields.get(NAME_COLUMN);
         int price = Integer.parseInt(fields.get(PRICE_COLUMN));
         int stockCount = Integer.parseInt(fields.get(STOCK_COUNT_COLUMN));
