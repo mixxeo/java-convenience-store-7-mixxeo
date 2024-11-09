@@ -32,6 +32,10 @@ public class OrderItem {
         return this.product.getName();
     }
 
+    public Product getProduct() {
+        return this.product;
+    }
+
     public int calculatePrice() {
         return this.quantity.value() * this.product.getPrice();
     }

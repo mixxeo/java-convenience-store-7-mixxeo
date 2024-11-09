@@ -52,4 +52,34 @@ public class StockManager {
     public int getPromotionStock(Product product) {
         return promotionStock.get(product);
     }
+
+    public void deductStock(Order order) {
+        for (OrderItem orderItem:order.items()) {
+            Product product = orderItem.getProduct();
+            int remainingQuantity = orderItem.getQuantity().value();
+
+            remainingQuantity = deductPromotionStock(product, remainingQuantity, orderItem);
+            deductNormalStock(product, remainingQuantity);
+        }
+    }
+
+    private int deductPromotionStock(Product product, int quantity, OrderItem orderItem) {
+        if (!orderItem.hasPromotion()) {
+            return quantity;
+        }
+
+        int currentPromotionStock = promotionStock.getOrDefault(product, 0);
+        int deductedPromotionStock = Integer.min(currentPromotionStock, quantity);
+        promotionStock.put(product, currentPromotionStock - deductedPromotionStock);
+        return quantity - deductedPromotionStock;
+    }
+
+    private void deductNormalStock(Product product, int quantity) {
+        if (quantity <= 0) {
+            return;
+        }
+
+        int currentStock = stock.getOrDefault(product, 0);
+        stock.put(product, currentStock - quantity);
+    }
 }

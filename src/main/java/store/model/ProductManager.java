@@ -65,4 +65,8 @@ public class ProductManager {
     public int getPromotionAppliedQuantity(Product product, Quantity quantity) {
         return stockManager.calculatePromotionAppliedQuantity(product, quantity);
     }
+
+    public void deductStock(Order order) {
+        stockManager.deductStock(order);
+    }
 }

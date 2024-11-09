@@ -43,6 +43,7 @@ public class StoreController {
         applyPromotions(order, productManager);
         boolean isMembership = suggestMembershipSale();
         generateReceipt(order, isMembership);
+        productManager.deductStock(order);
         suggestReorder(productManager);
     }
 
