@@ -84,8 +84,8 @@ public class OutputView {
                 .forEach(entry -> System.out.printf("%s\t\t\t\t%,d%n", entry.productName(), entry.freeQuantity()));
         System.out.println("====================================");
         System.out.printf("총구매액\t\t\t\t%,d\t\t%,d%n", receipt.totalQuantity(), receipt.totalPrice());
-        System.out.printf("행사할인\t\t\t\t\t\t%,d%n", receipt.promotionDiscount());
-        System.out.printf("멤버십할인\t\t\t\t\t\t%,d%n", receipt.memberShipDiscount());
+        System.out.printf("행사할인\t\t\t\t\t\t-%,d%n", receipt.promotionDiscount());
+        System.out.printf("멤버십할인\t\t\t\t\t\t-%,d%n", receipt.memberShipDiscount());
         System.out.printf("내실돈\t\t\t\t\t\t%,d%n", receipt.paidAmount());
     }
 

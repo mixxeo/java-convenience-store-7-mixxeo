@@ -14,8 +14,8 @@ public record Receipt(
     public static Receipt of(List<ReceiptEntry> entries, Order order, boolean isMembership) {
         int totalQuantity = order.getTotalQuantity();
         int totalPrice = order.getTotalPrice();
-        int promotionDiscount = order.calculatePromotionDiscount() * -1;
-        int membershipDiscount = order.calculateMembershipDiscount(isMembership) * -1;
+        int promotionDiscount = order.calculatePromotionDiscount();
+        int membershipDiscount = order.calculateMembershipDiscount(isMembership);
         int paidAmount = totalPrice + promotionDiscount + membershipDiscount;
         return new Receipt(entries, totalQuantity, totalPrice, promotionDiscount, membershipDiscount, paidAmount);
     }
