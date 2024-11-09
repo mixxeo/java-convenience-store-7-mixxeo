@@ -22,7 +22,7 @@ public enum PromotionType {
     }
 
     public boolean isEligibleQuantity(Quantity quantity) {
-        return quantity.value() % buyQuantity == buyQuantity - 1;
+        return (quantity.value() + 1) % (buyQuantity + freeQuantity) == 0;
     }
 
     public int calculateMaxAppliedCount(int count) {
