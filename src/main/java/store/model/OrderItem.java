@@ -71,7 +71,7 @@ public class OrderItem {
     }
 
     public void setFreeQuantity(int promotionAppliedQuantity) {
-        int freeQuantity = promotion.getFreeQuantity(promotionAppliedQuantity);
-        this.freeQuantity = quantity.increase(freeQuantity);
+        int freeQuantityValue = promotion.getFreeQuantity(promotionAppliedQuantity);
+        this.freeQuantity = freeQuantity.increase(freeQuantityValue);
     }
 }
