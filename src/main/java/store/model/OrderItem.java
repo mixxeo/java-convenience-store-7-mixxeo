@@ -2,7 +2,6 @@ package store.model;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
-import store.dto.ReceiptEntry;
 
 public class OrderItem {
     private final Product product;

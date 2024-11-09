@@ -74,7 +74,19 @@ public class OutputView {
     public void printReceipt(Receipt receipt) {
         System.out.println();
         System.out.println("==============W 편의점================");
-        System.out.println("상품명\t\t수량\t금액\n");
+        System.out.println("상품명\t\t\t\t수량\t\t금액");
+        receipt.entries().forEach(
+                entry -> System.out.printf("%s\t\t\t\t%,d\t\t%,d%n", entry.productName(), entry.quantity(),
+                        entry.price()));
+        System.out.println("=============증\t\t정===============");
+        receipt.entries().stream()
+                .filter(entry -> entry.freeQuantity() != 0)
+                .forEach(entry -> System.out.printf("%s\t\t\t\t%,d%n", entry.productName(), entry.freeQuantity()));
+        System.out.println("====================================");
+        System.out.printf("총구매액\t\t\t\t%,d\t\t%,d%n", receipt.totalQuantity(), receipt.totalPrice());
+        System.out.printf("행사할인\t\t\t\t\t\t%,d%n", receipt.promotionDiscount());
+        System.out.printf("멤버십할인\t\t\t\t\t\t%,d%n", receipt.memberShipDiscount());
+        System.out.printf("내실돈\t\t\t\t\t\t%,d%n", receipt.paidAmount());
     }
 
     public void printSuggestReorder() {
