@@ -21,7 +21,7 @@ public record Order(List<OrderItem> items) {
         }
     }
 
-    public List<OrderItem> findEligibleItemsForPromotion() {
+    public List<OrderItem> getEligibleItemsForPromotion() {
         return items.stream()
                 .filter(OrderItem::isEligibleForPromotion)
                 .toList();
@@ -73,7 +73,7 @@ public record Order(List<OrderItem> items) {
                 .sum();
     }
 
-    public List<OrderItem> getNotAppliedPromotionItems() {
+    private List<OrderItem> getNotAppliedPromotionItems() {
         return items.stream()
                 .filter(item -> item.getFreeQuantity().value() == 0)
                 .toList();

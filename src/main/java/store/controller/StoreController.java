@@ -59,7 +59,7 @@ public class StoreController {
     }
 
     private void applyPromotions(final Order order, final ProductManager productManager) {
-        List<OrderItem> eligibleOrderItemsForPromotion = order.findEligibleItemsForPromotion();
+        List<OrderItem> eligibleOrderItemsForPromotion = order.getEligibleItemsForPromotion();
         for (OrderItem orderItem : eligibleOrderItemsForPromotion) {
             ResponseType response = requestWithRetry(() -> suggestAddingQuantityForPromotion(orderItem));
             if (response.equals(ResponseType.YES)) {

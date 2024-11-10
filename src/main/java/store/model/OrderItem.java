@@ -31,14 +31,6 @@ public class OrderItem {
         return new OrderItem(product, quantity, promotion);
     }
 
-    public String getProductName() {
-        return this.product.getName();
-    }
-
-    public Product getProduct() {
-        return this.product;
-    }
-
     public int calculatePrice() {
         return this.quantity.value() * this.product.getPrice();
     }
@@ -47,19 +39,27 @@ public class OrderItem {
         return this.freeQuantity.value() * this.product.getPrice();
     }
 
-    public Quantity getQuantity() {
-        return this.quantity;
-    }
-
-    public Quantity getFreeQuantity() {
-        return this.freeQuantity;
-    }
-
     public boolean isEligibleForPromotion() {
         if (promotion == null) {
             return false;
         }
         return promotion.isEligibleQuantity(quantity);
+    }
+
+    public boolean hasPromotion() {
+        return promotion != null;
+    }
+
+    public String getProductName() {
+        return this.product.getName();
+    }
+
+    public Product getProduct() {
+        return this.product;
+    }
+
+    public Quantity getQuantity() {
+        return this.quantity;
     }
 
     public void increaseQuantity() {
@@ -70,8 +70,8 @@ public class OrderItem {
         this.quantity = quantity.decrease(amount);
     }
 
-    public boolean hasPromotion() {
-        return promotion != null;
+    public Quantity getFreeQuantity() {
+        return this.freeQuantity;
     }
 
     public void setFreeQuantity(final int promotionAppliedQuantity) {
