@@ -8,7 +8,7 @@ public class Product {
     private final int price;
     private final Promotion promotion;
 
-    public Product(ProductBuilder builder) {
+    public Product(final ProductBuilder builder) {
         this.name = builder.name();
         this.price = builder.price();
         this.promotion = builder.promotion();
@@ -18,7 +18,7 @@ public class Product {
         return promotion != null;
     }
 
-    public boolean hasInProgressPromotion(LocalDate now) {
+    public boolean hasInProgressPromotion(final LocalDate now) {
         if (!hasPromotion()) return false;
 
         Promotion promotion = getPromotion();

@@ -10,27 +10,27 @@ public enum PromotionType {
 
     private final int buyQuantity;
 
-    PromotionType(int buyQuantity) {
+    PromotionType(final int buyQuantity) {
         this.buyQuantity = buyQuantity;
     }
 
-    public static PromotionType getType(int buyQuantity) {
+    public static PromotionType getType(final int buyQuantity) {
         return Arrays.stream(PromotionType.values())
                 .filter(type -> type.buyQuantity == buyQuantity)
                 .findFirst()
                 .orElse(null);
     }
 
-    public boolean isEligibleQuantity(Quantity quantity) {
+    public boolean isEligibleQuantity(final Quantity quantity) {
         return (quantity.value() + 1) % (buyQuantity + freeQuantity) == 0;
     }
 
-    public int calculateMaxAppliedCount(int count) {
+    public int calculateMaxAppliedCount(final int count) {
         int totalQuantity = buyQuantity + freeQuantity;
         return count - (count % totalQuantity);
     }
 
-    public int calculateFreeQuantity(int appliedQuantity) {
+    public int calculateFreeQuantity(final int appliedQuantity) {
         int totalQuantity = buyQuantity + freeQuantity;
         return appliedQuantity / totalQuantity;
     }

@@ -17,7 +17,7 @@ public class OrderService {
     private static final int PRODUCT_NAME_GROUP_INDEX = 1;
     private static final int QUANTITY_GROUP_INDEX = 2;
 
-    public Order createOrder(String orderInput, ProductManager productManager) {
+    public Order createOrder(final String orderInput, final ProductManager productManager) {
         List<String> items = List.of(orderInput.split(ORDER_ITEM_SEPARATOR));
         List<OrderItem> orderItems = items.stream()
                 .map(item -> createOrderItem(item, productManager))
@@ -25,7 +25,7 @@ public class OrderService {
         return new Order(orderItems);
     }
 
-    private OrderItem createOrderItem(String item, ProductManager productManager) {
+    private OrderItem createOrderItem(final String item, final ProductManager productManager) {
         Matcher matcher = ORDER_ITEM_PATTERN.matcher(item);
         validateOrderFormat(matcher);
 
@@ -34,13 +34,13 @@ public class OrderService {
         return OrderItem.of(productName, quantity, productManager);
     }
 
-    private void validateOrderFormat(Matcher matcher) {
+    private void validateOrderFormat(final Matcher matcher) {
         if (!matcher.matches()) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_INVALID_FORMAT.getMessage());
         }
     }
 
-    public Receipt generateReceipt(Order order, boolean isMembership) {
+    public Receipt generateReceipt(final Order order, final boolean isMembership) {
         List<ReceiptEntry> receiptEntries = order.items().stream()
                 .map(ReceiptEntry::from)
                 .toList();

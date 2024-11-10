@@ -4,7 +4,7 @@ import java.util.Map;
 import store.model.Promotion;
 
 public record ProductBuilder(String name, int price, Promotion promotion) {
-    public static ProductBuilder createWithoutPromotion(ProductFields productFields) {
+    public static ProductBuilder createWithoutPromotion(final ProductFields productFields) {
         return new ProductBuilder(
                 productFields.name(),
                 productFields.price(),
@@ -13,8 +13,8 @@ public record ProductBuilder(String name, int price, Promotion promotion) {
     }
 
     public static ProductBuilder createWithPromotion(
-            ProductFields promotionFields,
-            Map<String, Promotion> promotions
+            final ProductFields promotionFields,
+            final Map<String, Promotion> promotions
     ) {
         return new ProductBuilder(
                 promotionFields.name(),

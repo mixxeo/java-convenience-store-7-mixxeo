@@ -9,7 +9,7 @@ public record Quantity(int value) {
         return new Quantity(0);
     }
 
-    public static Quantity from(String input) {
+    public static Quantity from(final String input) {
         validateNumberFormat(input);
         validatePositiveIntegerRange(input);
         return new Quantity(Integer.parseInt(input));
@@ -40,11 +40,11 @@ public record Quantity(int value) {
         }
     }
 
-    public Quantity increase(int amount) {
+    public Quantity increase(final int amount) {
         return new Quantity(value + amount);
     }
 
-    public Quantity decrease(int amount) {
+    public Quantity decrease(final int amount) {
         return new Quantity(value - amount);
     }
 }

@@ -17,11 +17,11 @@ public class ProductManager {
         return this.products;
     }
 
-    public int getNormalStock(Product product) {
+    public int getNormalStock(final Product product) {
         return stockManager.getNormalStock(product);
     }
 
-    public int getPromotionStock(Product product) {
+    public int getPromotionStock(final Product product) {
         return stockManager.getPromotionStock(product);
     }
 
@@ -32,37 +32,37 @@ public class ProductManager {
         }
     }
 
-    public void validateHasProduct(String name) {
+    public void validateHasProduct(final String name) {
         if (findByName(name) == null) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_NOT_EXISTING_PRODUCT.getMessage());
         }
     }
 
-    public void validateStockAvailability(Product product, Quantity quantity, LocalDate date) {
+    public void validateStockAvailability(final Product product, final Quantity quantity, final LocalDate date) {
         if (stockManager.isInSufficientStock(product, quantity, date)) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_MORE_THAN_STOCK_COUNT.getMessage());
         }
     }
 
-    public Promotion getInProgressPromotionOfProduct(Product product, LocalDate date) {
+    public Promotion getInProgressPromotionOfProduct(final Product product, final LocalDate date) {
         if (product.hasInProgressPromotion(date)) {
             return product.getPromotion();
         }
         return null;
     }
 
-    public Product findByName(String name) {
+    public Product findByName(final String name) {
         return products.stream()
                 .filter(product -> product.getName().equals(name))
                 .findFirst()
                 .orElse(null);
     }
 
-    public int getInSufficientPromotionStock(Product product, Quantity quantity) {
+    public int getInSufficientPromotionStock(final Product product, final Quantity quantity) {
         return stockManager.calculateInSufficientPromotionStock(product, quantity);
     }
 
-    public int getPromotionAppliedQuantity(Product product, Quantity quantity) {
+    public int getPromotionAppliedQuantity(final Product product, final Quantity quantity) {
         return stockManager.calculatePromotionAppliedQuantity(product, quantity);
     }
 

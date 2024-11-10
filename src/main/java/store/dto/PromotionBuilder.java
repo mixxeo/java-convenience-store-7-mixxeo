@@ -12,7 +12,7 @@ public record PromotionBuilder(String name, PromotionType type, LocalDate startD
     private static final int END_DATE_COLUMN = 4;
     private static final String DATE_FORMAT = "yyyy-MM-dd";
 
-    public static PromotionBuilder from(List<String> fields) {
+    public static PromotionBuilder from(final List<String> fields) {
         String name = fields.get(NAME_COLUMN);
         int buyQuantity = Integer.parseInt(fields.get(BUY_QUANTITY_COLUMN));
         PromotionType type = PromotionType.getType(buyQuantity);
@@ -22,7 +22,7 @@ public record PromotionBuilder(String name, PromotionType type, LocalDate startD
         return new PromotionBuilder(name, type, startDate, endDate);
     }
 
-    public static LocalDate convertToLocalDate(String dateString) {
+    public static LocalDate convertToLocalDate(final String dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         return LocalDate.parse(dateString, formatter);
     }

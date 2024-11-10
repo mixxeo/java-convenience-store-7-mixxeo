@@ -8,7 +8,7 @@ public record ReceiptEntry(
         int price,
         int freeQuantity
 ) {
-    public static ReceiptEntry from(OrderItem orderItem) {
+    public static ReceiptEntry from(final OrderItem orderItem) {
         return new ReceiptEntry(
                 orderItem.getProductName(),
                 orderItem.getQuantity().value(),

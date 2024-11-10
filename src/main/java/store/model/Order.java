@@ -11,7 +11,7 @@ public record Order(List<OrderItem> items) {
         validateHasDuplicated(items);
     }
 
-    private void validateHasDuplicated(List<OrderItem> items) {
+    private void validateHasDuplicated(final List<OrderItem> items) {
         long distinctNamesCount = items.stream()
                 .map(OrderItem::getProductName)
                 .distinct()
@@ -54,7 +54,7 @@ public record Order(List<OrderItem> items) {
         return sum(promotionPrices);
     }
 
-    public int calculateMembershipDiscount(boolean isMembership) {
+    public int calculateMembershipDiscount(final boolean isMembership) {
         if (!isMembership) {
             return 0;
         }
@@ -67,7 +67,7 @@ public record Order(List<OrderItem> items) {
         return Integer.min(discount, MAX_MEMBERSHIP_DISCOUNT);
     }
 
-    private int sum(List<Integer> numbers) {
+    private int sum(final List<Integer> numbers) {
         return numbers.stream()
                 .mapToInt(Integer::intValue)
                 .sum();

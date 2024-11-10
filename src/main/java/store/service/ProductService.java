@@ -49,19 +49,19 @@ public class ProductService {
                 .collect(Collectors.groupingBy(ProductFields::name, LinkedHashMap::new, Collectors.toList()));
     }
 
-    private List<String> loadData(String filePath) {
+    private List<String> loadData(final String filePath) {
         List<String> fileContent = FileManager.read(filePath);
         FileManager.removeHeader(fileContent);
         return fileContent;
     }
 
-    private List<String> parseData(String rawData) {
+    private List<String> parseData(final String rawData) {
         return List.of(rawData.split(COLUMN_SEPARATOR));
     }
 
     private List<Product> createProducts(
-            LinkedHashMap<String, List<ProductFields>> productFieldsByName,
-            Map<String, Promotion> promotions
+            final LinkedHashMap<String, List<ProductFields>> productFieldsByName,
+            final Map<String, Promotion> promotions
     ) {
         return productFieldsByName.values().stream()
                 .map(fields -> generateProductBuilder(fields, promotions))
@@ -69,7 +69,10 @@ public class ProductService {
                 .toList();
     }
 
-    private ProductBuilder generateProductBuilder(List<ProductFields> fields, Map<String, Promotion> promotions) {
+    private ProductBuilder generateProductBuilder(
+            final List<ProductFields> fields,
+            final Map<String, Promotion> promotions
+    ) {
         ProductFields normalProductFields = findProductFieldsByPromotionStatus(fields, false);
         ProductFields promotionProductFields = findProductFieldsByPromotionStatus(fields, true);
 
@@ -80,8 +83,8 @@ public class ProductService {
     }
 
     private StockManager initializeStockManager(
-            LinkedHashMap<String, List<ProductFields>> productFieldsByName,
-            List<Product> products
+            final LinkedHashMap<String, List<ProductFields>> productFieldsByName,
+            final List<Product> products
     ) {
         StockManager stockManager = new StockManager();
         for (Product product : products) {
@@ -93,7 +96,7 @@ public class ProductService {
         return stockManager;
     }
 
-    private int getStockCount(List<ProductFields> fields, boolean isPromotion) {
+    private int getStockCount(final List<ProductFields> fields, final boolean isPromotion) {
         ProductFields field = findProductFieldsByPromotionStatus(fields, isPromotion);
         if (field == null) {
             return 0;
@@ -102,8 +105,8 @@ public class ProductService {
     }
 
     private static ProductFields findProductFieldsByPromotionStatus(
-            List<ProductFields> productFields,
-            boolean hasPromotion
+            final List<ProductFields> productFields,
+            final boolean hasPromotion
     ) {
         return productFields.stream()
                 .filter(fields -> fields.hasPromotion() == hasPromotion)
@@ -111,13 +114,13 @@ public class ProductService {
                 .orElse(null);
     }
 
-    public List<CatalogEntry> convertToCatalogEntries(ProductManager productManager) {
+    public List<CatalogEntry> convertToCatalogEntries(final ProductManager productManager) {
         return productManager.getProducts().stream()
                 .flatMap(product -> createCatalogEntries(product, productManager).stream())
                 .toList();
     }
 
-    private List<CatalogEntry> createCatalogEntries(Product product, ProductManager productManager) {
+    private List<CatalogEntry> createCatalogEntries(final Product product, final ProductManager productManager) {
         List<CatalogEntry> catalogEntries = new ArrayList<>();
         if (product.hasPromotion()) {
             catalogEntries.add(CatalogEntry.ofPromotion(product, productManager.getPromotionStock(product)));

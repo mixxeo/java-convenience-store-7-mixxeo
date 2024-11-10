@@ -6,11 +6,11 @@ public enum ResponseType {
 
     private final String value;
 
-    ResponseType(String value) {
+    ResponseType(final String value) {
         this.value = value;
     }
 
-    public static ResponseType fromString(String input) {
+    public static ResponseType fromString(final String input) {
         validate(input);
         if (input.equals(YES.value)) {
             return YES;
@@ -18,13 +18,13 @@ public enum ResponseType {
         return NO;
     }
 
-    private static void validate(String input) {
+    private static void validate(final String input) {
         if (!isValid(input)) {
             throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
         }
     }
 
-    private static boolean isValid(String input) {
+    private static boolean isValid(final String input) {
         return input.equals(YES.value) || input.equals(NO.value);
     }
 }

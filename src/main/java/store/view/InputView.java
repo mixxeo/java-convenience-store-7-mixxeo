@@ -11,7 +11,7 @@ public class InputView {
         return input;
     }
 
-    private void validateEmptyString(String input) {
+    private void validateEmptyString(final String input) {
         if (StringUtils.isBlank(input)) {
             throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
         }

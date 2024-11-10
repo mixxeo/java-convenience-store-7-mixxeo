@@ -20,10 +20,10 @@ public class StoreController {
     private final OutputView outputView;
 
     public StoreController(
-            ProductService productService,
-            OrderService orderService,
-            InputView inputView,
-            OutputView outputView
+            final ProductService productService,
+            final OrderService orderService,
+            final InputView inputView,
+            final OutputView outputView
     ) {
         this.productService = productService;
         this.orderService = orderService;
@@ -36,7 +36,7 @@ public class StoreController {
         processOrder(productManager);
     }
 
-    private void processOrder(ProductManager productManager) {
+    private void processOrder(final ProductManager productManager) {
         productManager.validateProductsInStock();
         displayProductCatalog(productManager);
         Order order = requestWithRetry(() -> requestOrder(productManager));
@@ -47,18 +47,18 @@ public class StoreController {
         suggestReorder(productManager);
     }
 
-    private void displayProductCatalog(ProductManager productManager) {
+    private void displayProductCatalog(final ProductManager productManager) {
         List<CatalogEntry> catalogEntries = productService.convertToCatalogEntries(productManager);
         outputView.printProductCatalog(catalogEntries);
     }
 
-    private Order requestOrder(ProductManager productManager) {
+    private Order requestOrder(final ProductManager productManager) {
         outputView.printRequestOrder();
         String orderInput = inputView.read();
         return orderService.createOrder(orderInput, productManager);
     }
 
-    private void applyPromotions(Order order, ProductManager productManager) {
+    private void applyPromotions(final Order order, final ProductManager productManager) {
         List<OrderItem> eligibleOrderItemsForPromotion = order.findEligibleItemsForPromotion();
         for (OrderItem orderItem : eligibleOrderItemsForPromotion) {
             ResponseType response = requestWithRetry(() -> suggestAddingQuantityForPromotion(orderItem));
@@ -83,12 +83,12 @@ public class StoreController {
         }
     }
 
-    private ResponseType suggestAddingQuantityForPromotion(OrderItem orderItem) {
+    private ResponseType suggestAddingQuantityForPromotion(final OrderItem orderItem) {
         outputView.printOfferFreeProduct(orderItem.getProductName());
         return getYesOrNoResponse();
     }
 
-    private ResponseType notifyFullPriceQuantity(String productName, int quantity) {
+    private ResponseType notifyFullPriceQuantity(final String productName, final int quantity) {
         outputView.printFullPriceQuantityNotification(productName, quantity);
         return getYesOrNoResponse();
     }
@@ -99,7 +99,7 @@ public class StoreController {
         return response.equals(ResponseType.YES);
     }
 
-    private void suggestReorder(ProductManager productManager) {
+    private void suggestReorder(final ProductManager productManager) {
         outputView.printSuggestReorder();
         ResponseType response = requestWithRetry(this::getYesOrNoResponse);
         if (response.equals(ResponseType.YES)) {
@@ -112,7 +112,7 @@ public class StoreController {
         return ResponseType.fromString(response);
     }
 
-    private void generateReceipt(Order order, boolean isMembership) {
+    private void generateReceipt(final Order order, final boolean isMembership) {
         Receipt receipt = orderService.generateReceipt(order, isMembership);
         outputView.printReceipt(receipt);
     }

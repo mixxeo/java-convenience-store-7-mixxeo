@@ -9,14 +9,18 @@ public class OrderItem {
     private final Promotion promotion;
     private Quantity freeQuantity;
 
-    private OrderItem(Product product, Quantity quantity, Promotion promotion) {
+    private OrderItem(final Product product, final Quantity quantity, final Promotion promotion) {
         this.product = product;
         this.quantity = quantity;
         this.promotion = promotion;
         this.freeQuantity = Quantity.createInitialQuantity();
     }
 
-    public static OrderItem of(String productName, Quantity quantity, ProductManager productManager) {
+    public static OrderItem of(
+            final String productName,
+            final Quantity quantity,
+            final ProductManager productManager
+    ) {
         LocalDate now = DateTimes.now().toLocalDate();
 
         productManager.validateHasProduct(productName);
@@ -62,7 +66,7 @@ public class OrderItem {
         this.quantity = quantity.increase(1);
     }
 
-    public void decreaseQuantity(int amount) {
+    public void decreaseQuantity(final int amount) {
         this.quantity = quantity.decrease(amount);
     }
 
@@ -70,7 +74,7 @@ public class OrderItem {
         return promotion != null;
     }
 
-    public void setFreeQuantity(int promotionAppliedQuantity) {
+    public void setFreeQuantity(final int promotionAppliedQuantity) {
         int freeQuantityValue = promotion.getFreeQuantity(promotionAppliedQuantity);
         this.freeQuantity = freeQuantity.increase(freeQuantityValue);
     }
