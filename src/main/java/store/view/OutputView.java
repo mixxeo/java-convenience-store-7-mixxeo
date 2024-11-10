@@ -2,23 +2,12 @@ package store.view;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import store.constant.OutputMessage;
 import store.dto.CatalogEntry;
 import store.dto.Receipt;
+import store.dto.ReceiptEntry;
 
 public class OutputView {
-    private static final String WELCOME_MESSAGE = "안녕하세요. W편의점입니다.\n현재 보유하고 있는 상품입니다.\n";
-    private static final String PRODUCT_FORMAT = "- %s %,d원 %s";
-    private static final String PROMOTION_PRODUCT_FORMAT = PRODUCT_FORMAT + " %s";
-    private static final String OUT_OF_STOCK = "재고 없음";
-    private static final String PRODUCT_STOCK_COUNT_FORMAT = "%,d개";
-    private static final String ORDER_REQUEST_MESSAGE = "구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])";
-    private static final String FREE_PRODUCT_OFFER_FORMAT
-            = "현재 %s은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)%n";
-    private static final String FULL_PRICE_QUANTITY_NOTIFICATION_FORMAT
-            = "현재 %s %,d개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)%n";
-    private static final String MEMBERSHIP_SALE_SUGGESTION = "멤버십 할인을 받으시겠습니까? (Y/N)";
-    private static final String REORDER_SUGGESTION = "감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)";
-
     public void printProductCatalog(List<CatalogEntry> productInformation) {
         printWelcomeMessage();
         String catalog = productInformation.stream()
@@ -29,7 +18,7 @@ public class OutputView {
 
     private void printWelcomeMessage() {
         System.out.println();
-        System.out.println(WELCOME_MESSAGE);
+        System.out.println(OutputMessage.WELCOME_MESSAGE.getMessage());
     }
 
     private String buildProductMessage(CatalogEntry catalogEntry) {
@@ -39,59 +28,87 @@ public class OutputView {
         String promotionName = catalogEntry.promotionName();
 
         if (promotionName == null) {
-            return String.format(PRODUCT_FORMAT, name, price, stockCount);
+            return String.format(OutputMessage.PRODUCT_FORMAT.getMessage(), name, price, stockCount);
         }
-        return String.format(PROMOTION_PRODUCT_FORMAT, name, price, stockCount, promotionName);
+        return String.format(OutputMessage.PROMOTION_PRODUCT_FORMAT.getMessage(), name, price, stockCount, promotionName);
     }
 
     private String formatProductStockCount(int stockCount) {
         if (stockCount == 0) {
-            return OUT_OF_STOCK;
+            return OutputMessage.OUT_OF_STOCK.getMessage();
         }
-        return String.format(PRODUCT_STOCK_COUNT_FORMAT, stockCount);
+        return String.format(OutputMessage.PRODUCT_STOCK_COUNT_FORMAT.getMessage(), stockCount);
     }
 
     public void printRequestOrder() {
         System.out.println();
-        System.out.println(ORDER_REQUEST_MESSAGE);
+        System.out.println(OutputMessage.ORDER_REQUEST_MESSAGE.getMessage());
     }
 
     public void printOfferFreeProduct(String productName) {
         System.out.println();
-        System.out.printf(FREE_PRODUCT_OFFER_FORMAT, productName);
+        System.out.printf(OutputMessage.FREE_PRODUCT_OFFER_FORMAT.getMessage(), productName);
     }
 
     public void printFullPriceQuantityNotification(String productName, int quantity) {
         System.out.println();
-        System.out.printf(FULL_PRICE_QUANTITY_NOTIFICATION_FORMAT, productName, quantity);
+        System.out.printf(OutputMessage.FULL_PRICE_QUANTITY_NOTIFICATION_FORMAT.getMessage(), productName, quantity);
     }
 
     public void printSuggestMembershipSale() {
         System.out.println();
-        System.out.println(MEMBERSHIP_SALE_SUGGESTION);
+        System.out.println(OutputMessage.MEMBERSHIP_SALE_SUGGESTION.getMessage());
     }
 
     public void printReceipt(Receipt receipt) {
-        System.out.println();
-        System.out.println("==============W 편의점================");
-        System.out.println("상품명\t\t\t\t수량\t\t금액");
-        receipt.entries().forEach(
-                entry -> System.out.printf("%s\t\t\t\t%,d\t\t%,d%n", entry.productName(), entry.quantity(),
-                        entry.price()));
-        System.out.println("=============증\t\t정===============");
-        receipt.entries().stream()
-                .filter(entry -> entry.freeQuantity() != 0)
-                .forEach(entry -> System.out.printf("%s\t\t\t\t%,d%n", entry.productName(), entry.freeQuantity()));
-        System.out.println("====================================");
-        System.out.printf("총구매액\t\t\t\t%,d\t\t%,d%n", receipt.totalQuantity(), receipt.totalPrice());
-        System.out.printf("행사할인\t\t\t\t\t\t-%,d%n", receipt.promotionDiscount());
-        System.out.printf("멤버십할인\t\t\t\t\t\t-%,d%n", receipt.memberShipDiscount());
-        System.out.printf("내실돈\t\t\t\t\t\t%,d%n", receipt.paidAmount());
+        String receiptContents = new StringBuilder("\n")
+                .append("==============W 편의점================\n")
+                .append(buildProductItems(receipt.entries()))
+                .append("=============증\t\t정===============\n")
+                .append(buildFreePromotionItems(receipt.entries()))
+                .append("====================================\n")
+                .append(buildPriceInformation(receipt)).toString();
+        System.out.println(receiptContents);
+    }
+
+    private String buildProductItems(List<ReceiptEntry> receiptEntries) {
+        StringBuilder productItems = new StringBuilder(String.format("%-7s\t\t\t%-10s%s%n", "상품명", "수량", "금액"));
+        receiptEntries.forEach(entry -> {
+            String format = "%-" + getPrintKoreanLength(entry.productName()) + "s\t\t\t%,-10d%,d%n";
+            String itemContents = String.format(format, entry.productName(), entry.quantity(), entry.price());
+            productItems.append(itemContents);
+        });
+        return productItems.toString();
+    }
+
+    private String buildFreePromotionItems(List<ReceiptEntry> receiptEntries) {
+        StringBuilder freePromotionItems = new StringBuilder();
+        receiptEntries.stream()
+                .filter(entry -> entry.freeQuantity() > 0)
+                .forEach(entry -> {
+                    String format = "%-" + getPrintKoreanLength(entry.productName()) + "s\t\t\t%,d%n";
+                    String itemContents = String.format(format, entry.productName(), entry.freeQuantity());
+                    freePromotionItems.append(itemContents);
+                });
+        return freePromotionItems.toString();
+    }
+
+    private int getPrintKoreanLength(String string) {
+        return 10 - string.length();
+    }
+
+    private String buildPriceInformation(Receipt receipt) {
+        StringBuilder priceInformation = new StringBuilder();
+        priceInformation.append(String.format("%-6s\t\t\t%,-12d%-5s%n","총구매액",receipt.totalQuantity(), receipt.totalPrice()));
+        priceInformation.append(String.format("%-6s\t\t\t\t\t\t%-5s%n","행사할인",receipt.promotionDiscount()));
+        priceInformation.append(String.format("%-5s\t\t\t\t\t\t%-5s%n","멤버십할인",receipt.memberShipDiscount()));
+        priceInformation.append(String.format("%-7s\t\t\t\t\t\t%6s%n","내실돈",receipt.paidAmount()));
+        return priceInformation.toString();
     }
 
     public void printSuggestReorder() {
         System.out.println();
-        System.out.println(REORDER_SUGGESTION);
+        System.out.println(OutputMessage.REORDER_SUGGESTION.getMessage());
     }
 
     public void printMessage(String message) {
