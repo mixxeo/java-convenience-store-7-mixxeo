@@ -30,7 +30,8 @@ public class OutputView {
         if (promotionName == null) {
             return String.format(OutputMessage.PRODUCT_FORMAT.getMessage(), name, price, stockCount);
         }
-        return String.format(OutputMessage.PROMOTION_PRODUCT_FORMAT.getMessage(), name, price, stockCount, promotionName);
+        return String.format(OutputMessage.PROMOTION_PRODUCT_FORMAT.getMessage(), name, price, stockCount,
+                promotionName);
     }
 
     private String formatProductStockCount(int stockCount) {
@@ -61,18 +62,23 @@ public class OutputView {
     }
 
     public void printReceipt(Receipt receipt) {
-        String receiptContents = new StringBuilder("\n")
+        StringBuilder receiptContents = new StringBuilder("\n")
                 .append("==============W 편의점================\n")
+                .append(buildProductItemHeader())
                 .append(buildProductItems(receipt.entries()))
                 .append("=============증\t\t정===============\n")
                 .append(buildFreePromotionItems(receipt.entries()))
                 .append("====================================\n")
-                .append(buildPriceInformation(receipt)).toString();
+                .append(buildPriceInformation(receipt));
         System.out.println(receiptContents);
     }
 
+    private String buildProductItemHeader() {
+        return String.format("%-10s\t%10s\t%8s%n", "상품명", "수량", "금액");
+    }
+
     private String buildProductItems(List<ReceiptEntry> receiptEntries) {
-        StringBuilder productItems = new StringBuilder(String.format("%-7s\t\t\t%-10s%s%n", "상품명", "수량", "금액"));
+        StringBuilder productItems = new StringBuilder();
         receiptEntries.forEach(entry -> {
             String format = "%-" + getPrintKoreanLength(entry.productName()) + "s\t\t\t%,-10d%,d%n";
             String itemContents = String.format(format, entry.productName(), entry.quantity(), entry.price());
@@ -98,11 +104,11 @@ public class OutputView {
     }
 
     private String buildPriceInformation(Receipt receipt) {
-        StringBuilder priceInformation = new StringBuilder();
-        priceInformation.append(String.format("%-6s\t\t\t%,-12d%-5s%n","총구매액",receipt.totalQuantity(), receipt.totalPrice()));
-        priceInformation.append(String.format("%-6s\t\t\t\t\t\t%-5s%n","행사할인",receipt.promotionDiscount()));
-        priceInformation.append(String.format("%-5s\t\t\t\t\t\t%-5s%n","멤버십할인",receipt.memberShipDiscount()));
-        priceInformation.append(String.format("%-7s\t\t\t\t\t\t%6s%n","내실돈",receipt.paidAmount()));
+        StringBuilder priceInformation = new StringBuilder()
+                .append(String.format("%-6s\t\t\t%,-10d%s%n", "총구매액", receipt.totalQuantity(), receipt.totalPrice()))
+                .append(String.format("%-5s\t\t\t\t\t\t  %-12s%n", "행사할인", receipt.promotionDiscount()))
+                .append(String.format("%-5s\t\t\t\t\t\t  %-12s%n", "멤버십할인", receipt.memberShipDiscount()))
+                .append(String.format("%-6s\t\t\t\t\t\t  %6s%n", "내실돈", receipt.paidAmount()));
         return priceInformation.toString();
     }
 
