@@ -56,9 +56,9 @@ public class OutputView {
         System.out.printf(OutputMessage.FULL_PRICE_QUANTITY_NOTIFICATION_FORMAT.getMessage(), productName, quantity);
     }
 
-    public void printSuggestMembershipSale() {
+    public void printSuggestApplyingMembershipDiscount() {
         System.out.println();
-        System.out.println(OutputMessage.MEMBERSHIP_SALE_SUGGESTION.getMessage());
+        System.out.println(OutputMessage.MEMBERSHIP_DISCOUNT_SUGGESTION.getMessage());
     }
 
     public void printReceipt(Receipt receipt) {
@@ -105,10 +105,10 @@ public class OutputView {
 
     private String buildPriceInformation(Receipt receipt) {
         StringBuilder priceInformation = new StringBuilder()
-                .append(String.format("%-6s\t\t\t%,-10d%s%n", "총구매액", receipt.totalQuantity(), receipt.totalPrice()))
-                .append(String.format("%-5s\t\t\t\t\t\t  %-12s%n", "행사할인", receipt.promotionDiscount()))
-                .append(String.format("%-5s\t\t\t\t\t\t  %-12s%n", "멤버십할인", receipt.memberShipDiscount()))
-                .append(String.format("%-6s\t\t\t\t\t\t  %6s%n", "내실돈", receipt.paidAmount()));
+                .append(String.format("%-6s\t\t\t%,-10d%,d%n", "총구매액", receipt.totalQuantity(), receipt.totalPrice()))
+                .append(String.format("%-5s\t\t\t\t\t\t  -%,-12d%n", "행사할인", receipt.promotionDiscount()))
+                .append(String.format("%-5s\t\t\t\t\t\t  -%,-12d%n", "멤버십할인", receipt.memberShipDiscount()))
+                .append(String.format("%-6s\t\t\t\t\t\t  %,6d%n", "내실돈", receipt.getPaidAmount()));
         return priceInformation.toString();
     }
 

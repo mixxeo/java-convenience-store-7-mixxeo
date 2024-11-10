@@ -1,7 +1,6 @@
 package store.controller;
 
 import java.util.List;
-import store.constant.ExceptionMessage;
 import store.constant.ResponseType;
 import store.dto.CatalogEntry;
 import store.dto.Receipt;
@@ -42,7 +41,7 @@ public class StoreController {
         displayProductCatalog(productManager);
         Order order = requestWithRetry(() -> requestOrder(productManager));
         applyPromotions(order, productManager);
-        boolean isMembership = suggestMembershipSale();
+        boolean isMembership = suggestApplyingMembershipDiscount();
         generateReceipt(order, isMembership);
         productManager.deductStock(order);
         suggestReorder(productManager);
@@ -94,19 +93,15 @@ public class StoreController {
         return getYesOrNoResponse();
     }
 
-    private boolean suggestMembershipSale() {
-        ResponseType response = requestWithRetry(() -> {
-            outputView.printSuggestMembershipSale();
-            return getYesOrNoResponse();
-        });
+    private boolean suggestApplyingMembershipDiscount() {
+        outputView.printSuggestApplyingMembershipDiscount();
+        ResponseType response = requestWithRetry(this::getYesOrNoResponse);
         return response.equals(ResponseType.YES);
     }
 
     private void suggestReorder(ProductManager productManager) {
-        ResponseType response = requestWithRetry(() -> {
-            outputView.printSuggestReorder();
-            return getYesOrNoResponse();
-        });
+        outputView.printSuggestReorder();
+        ResponseType response = requestWithRetry(this::getYesOrNoResponse);
         if (response.equals(ResponseType.YES)) {
             processOrder(productManager);
         }
@@ -114,14 +109,7 @@ public class StoreController {
 
     private ResponseType getYesOrNoResponse() {
         String response = inputView.read();
-        validateResponse(response);
         return ResponseType.fromString(response);
-    }
-
-    private void validateResponse(String input) {
-        if (!ResponseType.isValid(input)) {
-            throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
-        }
     }
 
     private void generateReceipt(Order order, boolean isMembership) {

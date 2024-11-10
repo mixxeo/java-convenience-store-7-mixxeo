@@ -33,14 +33,14 @@ public record Order(List<OrderItem> items) {
                 .toList();
     }
 
-    public int getTotalQuantity() {
+    public int calculateTotalQuantity() {
         List<Integer> quantities = items.stream()
                 .map(item -> item.getQuantity().value())
                 .toList();
         return sum(quantities);
     }
 
-    public int getTotalPrice() {
+    public int calculateTotalPrice() {
         List<Integer> prices = items.stream()
                 .map(OrderItem::calculatePrice)
                 .toList();
