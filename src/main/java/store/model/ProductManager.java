@@ -17,8 +17,8 @@ public class ProductManager {
         return this.products;
     }
 
-    public int getStock(Product product) {
-        return stockManager.getStock(product);
+    public int getNormalStock(Product product) {
+        return stockManager.getNormalStock(product);
     }
 
     public int getPromotionStock(Product product) {
@@ -28,7 +28,7 @@ public class ProductManager {
     public void validateProductsInStock() {
         boolean allProductsOutOfStock = products.stream().allMatch(stockManager::isOutOfStock);
         if (allProductsOutOfStock) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(ExceptionMessage.ALL_PRODUCTS_OUT_OF_STOCK.getMessage());
         }
     }
 

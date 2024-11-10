@@ -30,15 +30,6 @@ public class ProductService {
         return new ProductManager(products, stockManager);
     }
 
-    public List<CatalogEntry> convertToCatalogEntries(Product product, ProductManager productManager) {
-        List<CatalogEntry> catalogEntries = new ArrayList<>();
-        if (product.hasPromotion()) {
-            catalogEntries.add(CatalogEntry.ofPromotion(product, productManager.getPromotionStock(product)));
-        }
-        catalogEntries.add(CatalogEntry.of(product, productManager.getStock(product)));
-        return catalogEntries;
-    }
-
     private Map<String, Promotion> loadPromotions() {
         List<String> promotionsData = loadData(PROMOTION_RESOURCE_PATH);
         Map<String, Promotion> promotions = new HashMap<>();
@@ -79,13 +70,13 @@ public class ProductService {
     }
 
     private ProductBuilder generateProductBuilder(List<ProductFields> fields, Map<String, Promotion> promotions) {
-        ProductFields normalFields = findProductFieldsByPromotionStatus(fields, false);
-        ProductFields promotionFields = findProductFieldsByPromotionStatus(fields, true);
+        ProductFields normalProductFields = findProductFieldsByPromotionStatus(fields, false);
+        ProductFields promotionProductFields = findProductFieldsByPromotionStatus(fields, true);
 
-        if (promotionFields == null) {
-            return ProductBuilder.createWithoutPromotion(normalFields);
+        if (promotionProductFields == null) {
+            return ProductBuilder.createWithoutPromotion(normalProductFields);
         }
-        return ProductBuilder.createWithPromotion(promotionFields, promotions);
+        return ProductBuilder.createWithPromotion(promotionProductFields, promotions);
     }
 
     private StockManager initializeStockManager(
@@ -94,10 +85,10 @@ public class ProductService {
     ) {
         StockManager stockManager = new StockManager();
         for (Product product : products) {
-            List<ProductFields> fields = productFieldsByName.get(product.getName());
-            int stockCount = getStockCount(fields, false);
-            int promotionStockCount = getStockCount(fields, true);
-            stockManager.addStock(product, stockCount, promotionStockCount);
+            List<ProductFields> productFields = productFieldsByName.get(product.getName());
+            int normalStockCount = getStockCount(productFields, false);
+            int promotionStockCount = getStockCount(productFields, true);
+            stockManager.addStock(product, normalStockCount, promotionStockCount);
         }
         return stockManager;
     }
@@ -118,5 +109,20 @@ public class ProductService {
                 .filter(fields -> fields.hasPromotion() == hasPromotion)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public List<CatalogEntry> convertToCatalogEntries(ProductManager productManager) {
+        return productManager.getProducts().stream()
+                .flatMap(product -> createCatalogEntries(product, productManager).stream())
+                .toList();
+    }
+
+    private List<CatalogEntry> createCatalogEntries(Product product, ProductManager productManager) {
+        List<CatalogEntry> catalogEntries = new ArrayList<>();
+        if (product.hasPromotion()) {
+            catalogEntries.add(CatalogEntry.ofPromotion(product, productManager.getPromotionStock(product)));
+        }
+        catalogEntries.add(CatalogEntry.of(product, productManager.getNormalStock(product)));
+        return catalogEntries;
     }
 }

@@ -5,16 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StockManager {
-    private final Map<Product, Integer> stock = new HashMap<>();
+    private final Map<Product, Integer> normalStock = new HashMap<>();
     private final Map<Product, Integer> promotionStock = new HashMap<>();
 
-    public void addStock(Product product, int stockCount, int promotionStockCount) {
-        stock.put(product, stockCount);
+    public void addStock(Product product, int normalStockCount, int promotionStockCount) {
+        normalStock.put(product, normalStockCount);
         promotionStock.put(product, promotionStockCount);
     }
 
     public boolean isInSufficientStock(Product product, Quantity quantity, LocalDate date) {
-        int totalStockCount = getStock(product);
+        int totalStockCount = getNormalStock(product);
         if (product.hasInProgressPromotion(date)) {
             totalStockCount += getPromotionStock(product);
         }
@@ -22,7 +22,7 @@ public class StockManager {
     }
 
     public boolean isOutOfStock(Product product) {
-        return getStock(product) == 0 && getPromotionStock(product) == 0;
+        return getNormalStock(product) == 0 && getPromotionStock(product) == 0;
     }
 
     public int calculateInSufficientPromotionStock(Product product, Quantity quantity) {
@@ -45,8 +45,8 @@ public class StockManager {
         return promotion.getMaxAppliedCount(getPromotionStock(product));
     }
 
-    public int getStock(Product product) {
-        return stock.get(product);
+    public int getNormalStock(Product product) {
+        return normalStock.get(product);
     }
 
     public int getPromotionStock(Product product) {
@@ -79,7 +79,7 @@ public class StockManager {
             return;
         }
 
-        int currentStock = stock.getOrDefault(product, 0);
-        stock.put(product, currentStock - quantity);
+        int currentStock = normalStock.getOrDefault(product, 0);
+        normalStock.put(product, currentStock - quantity);
     }
 }

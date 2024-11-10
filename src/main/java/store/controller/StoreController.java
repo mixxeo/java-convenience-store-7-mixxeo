@@ -2,6 +2,7 @@ package store.controller;
 
 import java.util.List;
 import store.constant.ExceptionMessage;
+import store.constant.ResponseType;
 import store.dto.CatalogEntry;
 import store.dto.Receipt;
 import store.model.Order;
@@ -48,24 +49,21 @@ public class StoreController {
     }
 
     private void displayProductCatalog(ProductManager productManager) {
-        List<CatalogEntry> catalogEntry = productManager.getProducts().stream()
-                .flatMap(product -> productService.convertToCatalogEntries(product, productManager).stream())
-                .toList();
-        outputView.printProductCatalog(catalogEntry);
+        List<CatalogEntry> catalogEntries = productService.convertToCatalogEntries(productManager);
+        outputView.printProductCatalog(catalogEntries);
     }
 
     private Order requestOrder(ProductManager productManager) {
         outputView.printRequestOrder();
         String orderInput = inputView.read();
-        List<String> items = List.of(orderInput.split(","));
-        return orderService.createOrder(items, productManager);
+        return orderService.createOrder(orderInput, productManager);
     }
 
     private void applyPromotions(Order order, ProductManager productManager) {
         List<OrderItem> eligibleOrderItemsForPromotion = order.findEligibleItemsForPromotion();
         for (OrderItem orderItem : eligibleOrderItemsForPromotion) {
-            String response = requestWithRetry(() -> suggestAddingQuantityForPromotion(orderItem));
-            if (response.equals("Y")) {
+            ResponseType response = requestWithRetry(() -> suggestAddingQuantityForPromotion(orderItem));
+            if (response.equals(ResponseType.YES)) {
                 orderItem.increaseQuantity();
             }
         }
@@ -75,8 +73,8 @@ public class StoreController {
             Product product = productManager.findByName(orderItem.getProductName());
             int inSufficientStock = productManager.getInSufficientPromotionStock(product, orderItem.getQuantity());
             if (inSufficientStock > 0) {
-                String response = requestWithRetry(() -> notifyFullPriceQuantity(product.getName(), inSufficientStock));
-                if (response.equals("N")) {
+                ResponseType response = requestWithRetry(() -> notifyFullPriceQuantity(product.getName(), inSufficientStock));
+                if (response.equals(ResponseType.NO)) {
                     orderItem.decreaseQuantity(inSufficientStock);
                 }
             }
@@ -86,42 +84,42 @@ public class StoreController {
         }
     }
 
-    private String suggestAddingQuantityForPromotion(OrderItem orderItem) {
+    private ResponseType suggestAddingQuantityForPromotion(OrderItem orderItem) {
         outputView.printOfferFreeProduct(orderItem.getProductName());
-        return getYesOrNotResponse();
+        return getYesOrNoResponse();
     }
 
-    private String notifyFullPriceQuantity(String productName, int quantity) {
+    private ResponseType notifyFullPriceQuantity(String productName, int quantity) {
         outputView.printFullPriceQuantityNotification(productName, quantity);
-        return getYesOrNotResponse();
+        return getYesOrNoResponse();
     }
 
     private boolean suggestMembershipSale() {
-        String response = requestWithRetry(() -> {
+        ResponseType response = requestWithRetry(() -> {
             outputView.printSuggestMembershipSale();
-            return getYesOrNotResponse();
+            return getYesOrNoResponse();
         });
-        return response.equals("Y");
+        return response.equals(ResponseType.YES);
     }
 
     private void suggestReorder(ProductManager productManager) {
-        String response = requestWithRetry(() -> {
+        ResponseType response = requestWithRetry(() -> {
             outputView.printSuggestReorder();
-            return getYesOrNotResponse();
+            return getYesOrNoResponse();
         });
-        if (response.equals("Y")) {
+        if (response.equals(ResponseType.YES)) {
             processOrder(productManager);
         }
     }
 
-    private String getYesOrNotResponse() {
+    private ResponseType getYesOrNoResponse() {
         String response = inputView.read();
         validateResponse(response);
-        return response;
+        return ResponseType.fromString(response);
     }
 
     private void validateResponse(String input) {
-        if (!input.equals("Y") && !input.equals("N")) {
+        if (!ResponseType.isValid(input)) {
             throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
         }
     }

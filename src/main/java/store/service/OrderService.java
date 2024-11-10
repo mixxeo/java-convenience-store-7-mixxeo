@@ -12,11 +12,13 @@ import store.model.ProductManager;
 import store.model.Quantity;
 
 public class OrderService {
+    private static final String ORDER_ITEM_SEPARATOR = ",";
     private static final Pattern ORDER_ITEM_PATTERN = Pattern.compile("^\\[(.+)-(\\d+)]$");
     private static final int PRODUCT_NAME_GROUP_INDEX = 1;
     private static final int QUANTITY_GROUP_INDEX = 2;
 
-    public Order createOrder(List<String> items, ProductManager productManager) {
+    public Order createOrder(String orderInput, ProductManager productManager) {
+        List<String> items = List.of(orderInput.split(ORDER_ITEM_SEPARATOR));
         List<OrderItem> orderItems = items.stream()
                 .map(item -> createOrderItem(item, productManager))
                 .toList();
