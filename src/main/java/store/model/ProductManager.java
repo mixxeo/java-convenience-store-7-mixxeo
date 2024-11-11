@@ -62,8 +62,9 @@ public class ProductManager {
         return stockManager.calculateInSufficientPromotionStock(product, quantity);
     }
 
-    public int getPromotionAppliedQuantity(final Product product, final Quantity quantity) {
-        return stockManager.calculatePromotionAppliedQuantity(product, quantity);
+    public int getPromotionFreeQuantity(final Product product, final Quantity quantity) {
+        int promotionAppliedQuantity = stockManager.calculatePromotionAppliedQuantity(product, quantity);
+        return product.promotion().getFreeQuantity(promotionAppliedQuantity);
     }
 
     public void deductStock(Order order) {

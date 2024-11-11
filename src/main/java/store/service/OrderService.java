@@ -42,8 +42,8 @@ public class OrderService {
     }
 
     public void applyPromotionFreeQuantity(Product product, OrderItem orderItem, ProductManager productManager) {
-        int promotionAppliedQuantity = productManager.getPromotionAppliedQuantity(product, orderItem.getQuantity());
-        orderItem.setFreeQuantity(promotionAppliedQuantity);
+        int freeQuantity = productManager.getPromotionFreeQuantity(product, orderItem.getQuantity());
+        orderItem.setFreeQuantity(freeQuantity);
     }
 
     public Receipt generateReceipt(final Order order, final boolean isMembership) {
