@@ -8,6 +8,7 @@ import store.dto.Receipt;
 import store.dto.ReceiptEntry;
 import store.model.Order;
 import store.model.OrderItem;
+import store.model.Product;
 import store.model.ProductManager;
 import store.model.Quantity;
 
@@ -38,6 +39,11 @@ public class OrderService {
         if (!matcher.matches()) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_INVALID_FORMAT.getMessage());
         }
+    }
+
+    public void applyPromotionFreeQuantity(Product product, OrderItem orderItem, ProductManager productManager) {
+        int promotionAppliedQuantity = productManager.getPromotionAppliedQuantity(product, orderItem.getQuantity());
+        orderItem.setFreeQuantity(promotionAppliedQuantity);
     }
 
     public Receipt generateReceipt(final Order order, final boolean isMembership) {

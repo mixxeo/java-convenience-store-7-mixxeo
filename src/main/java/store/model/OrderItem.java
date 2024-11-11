@@ -62,8 +62,8 @@ public class OrderItem {
         return this.quantity;
     }
 
-    public void increaseQuantity() {
-        this.quantity = quantity.increase(1);
+    public void increaseQuantity(final int amount) {
+        this.quantity = quantity.increase(amount);
     }
 
     public void decreaseQuantity(final int amount) {

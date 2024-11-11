@@ -27,7 +27,7 @@ public record Order(List<OrderItem> items) {
                 .toList();
     }
 
-    public List<OrderItem> getHasPromotionItems() {
+    public List<OrderItem> getPromotionItems() {
         return items.stream()
                 .filter(OrderItem::hasPromotion)
                 .toList();

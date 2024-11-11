@@ -46,9 +46,9 @@ public class OutputView {
         System.out.println(OutputMessage.ORDER_REQUEST_MESSAGE.getMessage());
     }
 
-    public void printOfferFreeProduct(final String productName) {
+    public void printSuggestPromotionBenefit(final String productName) {
         System.out.println();
-        System.out.printf(OutputMessage.FREE_PRODUCT_OFFER_FORMAT.getMessage(), productName);
+        System.out.printf(OutputMessage.PROMOTION_BENEFIT_SUGGESTION_FORMAT.getMessage(), productName);
     }
 
     public void printFullPriceQuantityNotification(final String productName, final int quantity) {
@@ -56,7 +56,7 @@ public class OutputView {
         System.out.printf(OutputMessage.FULL_PRICE_QUANTITY_NOTIFICATION_FORMAT.getMessage(), productName, quantity);
     }
 
-    public void printSuggestApplyingMembershipDiscount() {
+    public void printConfirmMembershipDiscount() {
         System.out.println();
         System.out.println(OutputMessage.MEMBERSHIP_DISCOUNT_SUGGESTION.getMessage());
     }

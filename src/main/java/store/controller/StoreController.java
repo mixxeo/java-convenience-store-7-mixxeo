@@ -14,6 +14,8 @@ import store.view.InputView;
 import store.view.OutputView;
 
 public class StoreController {
+    private static final int PROMOTION_BENEFIT_QUANTITY = 1;
+
     private final ProductService productService;
     private final OrderService orderService;
     private final InputView inputView;
@@ -37,12 +39,13 @@ public class StoreController {
     }
 
     private void processOrder(final ProductManager productManager) {
-        productManager.validateProductsInStock();
         displayProductCatalog(productManager);
-        Order order = requestWithRetry(() -> requestOrder(productManager));
-        applyPromotions(order, productManager);
-        boolean isMembership = suggestApplyingMembershipDiscount();
-        generateReceipt(order, isMembership);
+
+        Order order = requestOrder(productManager);
+        processPromotions(order, productManager);
+        boolean isMembership = confirmMembershipDiscount();
+
+        displayReceipt(order, isMembership);
         productManager.deductStock(order);
         suggestReorder(productManager);
     }
@@ -53,38 +56,48 @@ public class StoreController {
     }
 
     private Order requestOrder(final ProductManager productManager) {
+        productManager.validateProductsInStock();
         outputView.printRequestOrder();
-        String orderInput = inputView.read();
-        return orderService.createOrder(orderInput, productManager);
+        return requestWithRetry(() -> {
+            String orderInput = inputView.read();
+            return orderService.createOrder(orderInput, productManager);
+        });
     }
 
-    private void applyPromotions(final Order order, final ProductManager productManager) {
-        List<OrderItem> eligibleOrderItemsForPromotion = order.getEligibleItemsForPromotion();
+    private void processPromotions(final Order order, final ProductManager productManager) {
+        informPromotionBenefits(order.getEligibleItemsForPromotion());
+        applyPromotions(order.getPromotionItems(), productManager);
+    }
+
+    private void informPromotionBenefits(List<OrderItem> eligibleOrderItemsForPromotion) {
         for (OrderItem orderItem : eligibleOrderItemsForPromotion) {
-            ResponseType response = requestWithRetry(() -> suggestAddingQuantityForPromotion(orderItem));
+            ResponseType response = suggestPromotionBenefit(orderItem);
             if (response.equals(ResponseType.YES)) {
-                orderItem.increaseQuantity();
+                orderItem.increaseQuantity(PROMOTION_BENEFIT_QUANTITY);
             }
-        }
-
-        List<OrderItem> hasPromotionOrderItems = order.getHasPromotionItems();
-        for (OrderItem orderItem : hasPromotionOrderItems) {
-            Product product = productManager.findByName(orderItem.getProductName());
-            int inSufficientStock = productManager.getInSufficientPromotionStock(product, orderItem.getQuantity());
-            if (inSufficientStock > 0) {
-                ResponseType response = requestWithRetry(() -> notifyFullPriceQuantity(product.getName(), inSufficientStock));
-                if (response.equals(ResponseType.NO)) {
-                    orderItem.decreaseQuantity(inSufficientStock);
-                }
-            }
-
-            int promotionAppliedQuantity = productManager.getPromotionAppliedQuantity(product, orderItem.getQuantity());
-            orderItem.setFreeQuantity(promotionAppliedQuantity);
         }
     }
 
-    private ResponseType suggestAddingQuantityForPromotion(final OrderItem orderItem) {
-        outputView.printOfferFreeProduct(orderItem.getProductName());
+    private void applyPromotions(List<OrderItem> promotionOrderItems, ProductManager productManager) {
+        for (OrderItem orderItem : promotionOrderItems) {
+            Product product = orderItem.getProduct();
+            confirmPromotionStock(product, orderItem, productManager);
+            orderService.applyPromotionFreeQuantity(product, orderItem, productManager);
+        }
+    }
+
+    private void confirmPromotionStock(Product product, OrderItem orderItem, ProductManager productManager) {
+        int inSufficientStock = productManager.getInSufficientPromotionStock(product, orderItem.getQuantity());
+        if (inSufficientStock > 0) {
+            ResponseType response = notifyFullPriceQuantity(product.getName(), inSufficientStock);
+            if (response.equals(ResponseType.NO)) {
+                orderItem.decreaseQuantity(inSufficientStock);
+            }
+        }
+    }
+
+    private ResponseType suggestPromotionBenefit(final OrderItem orderItem) {
+        outputView.printSuggestPromotionBenefit(orderItem.getProductName());
         return getYesOrNoResponse();
     }
 
@@ -93,28 +106,30 @@ public class StoreController {
         return getYesOrNoResponse();
     }
 
-    private boolean suggestApplyingMembershipDiscount() {
-        outputView.printSuggestApplyingMembershipDiscount();
-        ResponseType response = requestWithRetry(this::getYesOrNoResponse);
+    private boolean confirmMembershipDiscount() {
+        outputView.printConfirmMembershipDiscount();
+        ResponseType response = getYesOrNoResponse();
         return response.equals(ResponseType.YES);
+    }
+
+    private void displayReceipt(final Order order, final boolean isMembership) {
+        Receipt receipt = orderService.generateReceipt(order, isMembership);
+        outputView.printReceipt(receipt);
     }
 
     private void suggestReorder(final ProductManager productManager) {
         outputView.printSuggestReorder();
-        ResponseType response = requestWithRetry(this::getYesOrNoResponse);
+        ResponseType response = getYesOrNoResponse();
         if (response.equals(ResponseType.YES)) {
             processOrder(productManager);
         }
     }
 
     private ResponseType getYesOrNoResponse() {
-        String response = inputView.read();
-        return ResponseType.fromString(response);
-    }
-
-    private void generateReceipt(final Order order, final boolean isMembership) {
-        Receipt receipt = orderService.generateReceipt(order, isMembership);
-        outputView.printReceipt(receipt);
+        return requestWithRetry(() -> {
+            String response = inputView.read();
+            return ResponseType.fromString(response);
+        });
     }
 
     private <T> T requestWithRetry(SupplierWithException<T> request) {
