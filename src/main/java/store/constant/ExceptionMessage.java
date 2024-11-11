@@ -1,6 +1,7 @@
 package store.constant;
 
 public enum ExceptionMessage {
+    INVALID_DATA_FILE("데이터 파일을 읽을 수 없습니다."),
     ALL_PRODUCTS_OUT_OF_STOCK("모든 상품이 품절되었습니다."),
     INPUT_INVALID_VALUE("잘못된 입력입니다. 다시 입력해 주세요."),
     ORDER_INVALID_FORMAT("올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요."),

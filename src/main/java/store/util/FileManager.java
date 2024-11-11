@@ -5,13 +5,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import store.constant.ExceptionMessage;
 
 public class FileManager {
     public static List<String> read(final String path) {
         try {
             return readLines(path);
         } catch (IOException e) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(ExceptionMessage.INVALID_DATA_FILE.getMessage());
         }
     }
 
