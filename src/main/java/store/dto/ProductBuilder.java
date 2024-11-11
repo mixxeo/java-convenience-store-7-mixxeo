@@ -13,13 +13,13 @@ public record ProductBuilder(String name, int price, Promotion promotion) {
     }
 
     public static ProductBuilder createWithPromotion(
-            final ProductFields promotionFields,
+            final ProductFields productFields,
             final Map<String, Promotion> promotions
     ) {
         return new ProductBuilder(
-                promotionFields.name(),
-                promotionFields.price(),
-                promotions.get(promotionFields.promotion())
+                productFields.name(),
+                productFields.price(),
+                promotions.get(productFields.promotion())
         );
     }
 }

@@ -21,24 +21,20 @@ public class StockManager {
         return quantity.value() > totalStockCount;
     }
 
-    public boolean isOutOfStock(final Product product) {
-        return getNormalStock(product) == 0 && getPromotionStock(product) == 0;
-    }
-
     public int calculateInSufficientPromotionStock(final Product product, final Quantity quantity) {
         int maxAvailablePromotionStock = getMaxAvailablePromotionStock(product);
         return Integer.max(quantity.value() - maxAvailablePromotionStock, 0);
     }
 
     public int calculatePromotionAppliedQuantity(final Product product, final Quantity quantity) {
-        Promotion promotion = product.getPromotion();
+        Promotion promotion = product.promotion();
         int maxAvailablePromotionStock = getMaxAvailablePromotionStock(product);
         int maxPromotionAppliedQuantity = promotion.getMaxAppliedCount(quantity.value());
         return Integer.min(maxAvailablePromotionStock, maxPromotionAppliedQuantity);
     }
 
     private int getMaxAvailablePromotionStock(final Product product) {
-        Promotion promotion = product.getPromotion();
+        Promotion promotion = product.promotion();
         if (promotion == null) {
             return 0;
         }
@@ -53,8 +49,12 @@ public class StockManager {
         return promotionStock.get(product);
     }
 
+    public boolean isOutOfStock(final Product product) {
+        return getNormalStock(product) == 0 && getPromotionStock(product) == 0;
+    }
+
     public void deductStock(final Order order) {
-        for (OrderItem orderItem:order.items()) {
+        for (OrderItem orderItem : order.items()) {
             Product product = orderItem.getProduct();
             int remainingQuantity = orderItem.getQuantity().value();
 
@@ -67,7 +67,6 @@ public class StockManager {
         if (!orderItem.hasPromotion()) {
             return quantity;
         }
-
         int currentPromotionStock = promotionStock.getOrDefault(product, 0);
         int deductedPromotionStock = Integer.min(currentPromotionStock, quantity);
         promotionStock.put(product, currentPromotionStock - deductedPromotionStock);
@@ -78,7 +77,6 @@ public class StockManager {
         if (quantity <= 0) {
             return;
         }
-
         int currentStock = normalStock.getOrDefault(product, 0);
         normalStock.put(product, currentStock - quantity);
     }

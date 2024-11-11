@@ -3,15 +3,9 @@ package store.model;
 import java.time.LocalDate;
 import store.dto.ProductBuilder;
 
-public class Product {
-    private final String name;
-    private final int price;
-    private final Promotion promotion;
-
+public record Product(String name, int price, Promotion promotion) {
     public Product(final ProductBuilder builder) {
-        this.name = builder.name();
-        this.price = builder.price();
-        this.promotion = builder.promotion();
+        this(builder.name(), builder.price(), builder.promotion());
     }
 
     public boolean hasPromotion() {
@@ -19,21 +13,9 @@ public class Product {
     }
 
     public boolean hasInProgressPromotion(final LocalDate now) {
-        if (!hasPromotion()) return false;
-
-        Promotion promotion = getPromotion();
+        if (!hasPromotion()) {
+            return false;
+        }
         return promotion.isInProgress(now);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public Promotion getPromotion() {
-        return promotion;
     }
 }

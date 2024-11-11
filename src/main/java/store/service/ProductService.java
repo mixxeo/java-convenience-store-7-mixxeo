@@ -88,7 +88,7 @@ public class ProductService {
     ) {
         StockManager stockManager = new StockManager();
         for (Product product : products) {
-            List<ProductFields> productFields = productFieldsByName.get(product.getName());
+            List<ProductFields> productFields = productFieldsByName.get(product.name());
             int normalStockCount = getStockCount(productFields, false);
             int promotionStockCount = getStockCount(productFields, true);
             stockManager.addStock(product, normalStockCount, promotionStockCount);

@@ -32,11 +32,11 @@ public class OrderItem {
     }
 
     public int calculatePrice() {
-        return this.quantity.value() * this.product.getPrice();
+        return this.quantity.value() * this.product.price();
     }
 
     public int calculateFreePrice() {
-        return this.freeQuantity.value() * this.product.getPrice();
+        return this.freeQuantity.value() * this.product.price();
     }
 
     public boolean isEligibleForPromotion() {
@@ -51,7 +51,7 @@ public class OrderItem {
     }
 
     public String getProductName() {
-        return this.product.getName();
+        return this.product.name();
     }
 
     public Product getProduct() {
