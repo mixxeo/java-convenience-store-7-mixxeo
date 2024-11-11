@@ -67,4 +67,14 @@ public class OrderItemTest {
         int expected = quantity.value() * productManager.findByName("콜라").price();
         assertThat(orderItem.calculatePrice()).isEqualTo(expected);
     }
+
+    @Test
+    @DisplayName("증정 수량으로 할인 받은 금액을 계산한다.")
+    void testCalculateFreePrice() {
+        Quantity quantity = Quantity.from("10");
+        OrderItem orderItem = OrderItem.of("사이다", quantity, productManager);
+        orderItem.setFreeQuantity(5);
+        int expected = 5 * productManager.findByName("사이다").price();
+        assertThat(orderItem.calculateFreePrice()).isEqualTo(expected);
+    }
 }
