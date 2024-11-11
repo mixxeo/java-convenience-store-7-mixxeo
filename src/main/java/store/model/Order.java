@@ -58,7 +58,7 @@ public record Order(List<OrderItem> items) {
         if (!isMembership) {
             return 0;
         }
-        List<OrderItem> notPromotionAppliedItems = getNotAppliedPromotionItems();
+        List<OrderItem> notPromotionAppliedItems = getNotPromotionAppliedItems();
         List<Integer> notPromotionItemPrices = notPromotionAppliedItems.stream()
                 .map(OrderItem::calculatePrice)
                 .toList();
@@ -73,7 +73,7 @@ public record Order(List<OrderItem> items) {
                 .sum();
     }
 
-    private List<OrderItem> getNotAppliedPromotionItems() {
+    private List<OrderItem> getNotPromotionAppliedItems() {
         return items.stream()
                 .filter(item -> item.getFreeQuantity().value() == 0)
                 .toList();

@@ -38,6 +38,13 @@ public class ProductManager {
         }
     }
 
+    public Product findByName(final String name) {
+        return products.stream()
+                .filter(product -> product.name().equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
     public void validateStockAvailability(final Product product, final Quantity quantity, final LocalDate date) {
         if (stockManager.isInSufficientStock(product, quantity, date)) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_MORE_THAN_STOCK_COUNT.getMessage());
@@ -46,16 +53,9 @@ public class ProductManager {
 
     public Promotion getInProgressPromotionOfProduct(final Product product, final LocalDate date) {
         if (product.hasInProgressPromotion(date)) {
-            return product.getPromotion();
+            return product.promotion();
         }
         return null;
-    }
-
-    public Product findByName(final String name) {
-        return products.stream()
-                .filter(product -> product.getName().equals(name))
-                .findFirst()
-                .orElse(null);
     }
 
     public int getInSufficientPromotionStock(final Product product, final Quantity quantity) {

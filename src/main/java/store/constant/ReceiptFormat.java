@@ -7,8 +7,8 @@ public enum ReceiptFormat {
     TOTAL_PRICE("%-6s\t\t\t%,-10d%,d%n"),
     PROMOTION_DISCOUNT("%-5s\t\t\t\t\t  -%,-12d%n"),
     MEMBERSHIP_DISCOUNT("%-5s\t\t\t\t\t  -%,-12d%n"),
-    PAID_AMOUNT("%-6s\t\t\t\t\t  %,6d%n")
-    ;
+    PAID_AMOUNT("%-6s\t\t\t\t\t  %,6d%n");
+
     private final String format;
 
     ReceiptFormat(String format) {

@@ -22,8 +22,8 @@ public record PromotionBuilder(String name, PromotionType type, LocalDate startD
         return new PromotionBuilder(name, type, startDate, endDate);
     }
 
-    public static LocalDate convertToLocalDate(final String dateString) {
+    public static LocalDate convertToLocalDate(final String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-        return LocalDate.parse(dateString, formatter);
+        return LocalDate.parse(date, formatter);
     }
 }

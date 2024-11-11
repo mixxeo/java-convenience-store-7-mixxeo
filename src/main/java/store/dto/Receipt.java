@@ -10,7 +10,7 @@ public record Receipt(
         int promotionDiscount,
         int memberShipDiscount
 ) {
-    public static Receipt of(final List<ReceiptEntry> entries, Order order, final boolean isMembership) {
+    public static Receipt of(final List<ReceiptEntry> entries, final Order order, final boolean isMembership) {
         return new Receipt(
                 entries,
                 order.calculateTotalQuantity(),
