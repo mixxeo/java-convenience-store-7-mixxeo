@@ -27,15 +27,8 @@ public record Quantity(int value) {
 
     private static void validatePositiveIntegerRange(final String input) {
         try {
-            int value = Integer.parseInt(input);
-            validatePositive(value);
+            Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
-        }
-    }
-
-    private static void validatePositive(final int value) {
-        if (value <= 0) {
             throw new IllegalArgumentException(ExceptionMessage.INPUT_INVALID_VALUE.getMessage());
         }
     }
