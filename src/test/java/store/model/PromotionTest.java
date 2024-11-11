@@ -11,7 +11,7 @@ public class PromotionTest {
     @DisplayName("시작전 프로모션에 대해 진행 여부는 false를 반환한다.")
     void testIsInProgressFalseIfPromotionIsNotStarted() {
         Promotion notStartedPromotion = new Promotion(
-                "test",
+                "1+1",
                 PromotionType.BUY_ONE_GET_ONE_FREE,
                 LocalDate.of(2024,11,10),
                 LocalDate.of(2024,11,20)
@@ -24,7 +24,7 @@ public class PromotionTest {
     @DisplayName("진행중 프로모션에 대해 진행 여부는 true를 반환한다.")
     void testIsInProgressTrueIfPromotionIsInProgress() {
         Promotion inProgressPromotion = new Promotion(
-                "test",
+                "1+1",
                 PromotionType.BUY_ONE_GET_ONE_FREE,
                 LocalDate.of(2024,11,10),
                 LocalDate.of(2024,11,20)
@@ -37,7 +37,7 @@ public class PromotionTest {
     @DisplayName("종료된 프로모션에 대해 진행 여부는 false를 반환한다.")
     void testIsInProgressFalseIfPromotionIsEnded() {
         Promotion endedPromotion = new Promotion(
-                "test",
+                "1+1",
                 PromotionType.BUY_ONE_GET_ONE_FREE,
                 LocalDate.of(2024,11,10),
                 LocalDate.of(2024,11,20)

@@ -13,10 +13,23 @@ public class PromotionTypeTest {
             "1, true", "3, true", "5, true",
             "2, false", "4, false", "6, false"
     })
-    @DisplayName("1+1 프로모션 증정 여부를 수량에 따라 올바르게 반환한다.")
+    @DisplayName("1+1 프로모션 추가 증정 여부를 수량에 따라 올바르게 반환한다.")
     void testIsEligibleQuantityForBuyOneGetOneFree(int quantityValue, boolean expectedResult) {
         Quantity quantity = Quantity.from(String.valueOf(quantityValue));
         boolean result = PromotionType.BUY_ONE_GET_ONE_FREE.isEligibleQuantity(quantity);
+        assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1, false", "4, false", "7, false",
+            "2, true", "5, true", "8, true",
+            "3, false", "6, false", "9, false"
+    })
+    @DisplayName("2+1 프로모션 추가 증정 여부를 수량에 따라 올바르게 반환한다.")
+    void testIsEligibleQuantityForBuyTwoGetOneFree(int quantityValue, boolean expectedResult) {
+        Quantity quantity = Quantity.from(String.valueOf(quantityValue));
+        boolean result = PromotionType.BUY_TWO_GET_ONE_FREE.isEligibleQuantity(quantity);
         assertThat(result).isEqualTo(expectedResult);
     }
 
