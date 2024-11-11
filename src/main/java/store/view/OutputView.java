@@ -3,6 +3,7 @@ package store.view;
 import java.util.List;
 import java.util.stream.Collectors;
 import store.constant.OutputMessage;
+import store.constant.ReceiptFormat;
 import store.dto.CatalogEntry;
 import store.dto.Receipt;
 import store.dto.ReceiptEntry;
@@ -64,7 +65,7 @@ public class OutputView {
     public void printReceipt(final Receipt receipt) {
         StringBuilder receiptContents = new StringBuilder("\n")
                 .append("==============W 편의점================\n")
-                .append(buildProductItemHeader())
+                .append(ReceiptFormat.PRODUCT_ITEM_HEADER.getFormat())
                 .append(buildProductItems(receipt.entries()))
                 .append("=============증\t\t정===============\n")
                 .append(buildFreePromotionItems(receipt.entries()))
@@ -73,14 +74,10 @@ public class OutputView {
         System.out.println(receiptContents);
     }
 
-    private String buildProductItemHeader() {
-        return String.format("%-10s\t%10s\t%8s%n", "상품명", "수량", "금액");
-    }
-
     private String buildProductItems(final List<ReceiptEntry> receiptEntries) {
         StringBuilder productItems = new StringBuilder();
         receiptEntries.forEach(entry -> {
-            String format = "%-" + getPrintKoreanLength(entry.productName()) + "s\t\t\t%,-10d%,d%n";
+            String format = getKoreanWidth(entry.productName(), 10) + ReceiptFormat.PRODUCT_ITEM.getFormat();
             String itemContents = String.format(format, entry.productName(), entry.quantity(), entry.price());
             productItems.append(itemContents);
         });
@@ -92,23 +89,27 @@ public class OutputView {
         receiptEntries.stream()
                 .filter(entry -> entry.freeQuantity() > 0)
                 .forEach(entry -> {
-                    String format = "%-" + getPrintKoreanLength(entry.productName()) + "s\t\t\t%,d%n";
+                    String format = getKoreanWidth(entry.productName(), 10) + ReceiptFormat.PROMOTION_ITEM.getFormat();
                     String itemContents = String.format(format, entry.productName(), entry.freeQuantity());
                     freePromotionItems.append(itemContents);
                 });
         return freePromotionItems.toString();
     }
 
-    private int getPrintKoreanLength(final String string) {
-        return 10 - string.length();
+    private String getKoreanWidth(final String text, final int targetWidth) {
+        int length = targetWidth - text.length();
+        return "%-" + length + "s";
     }
 
     private String buildPriceInformation(final Receipt receipt) {
         StringBuilder priceInformation = new StringBuilder()
-                .append(String.format("%-6s\t\t\t%,-10d%,d%n", "총구매액", receipt.totalQuantity(), receipt.totalPrice()))
-                .append(String.format("%-5s\t\t\t\t\t\t  -%,-12d%n", "행사할인", receipt.promotionDiscount()))
-                .append(String.format("%-5s\t\t\t\t\t\t  -%,-12d%n", "멤버십할인", receipt.memberShipDiscount()))
-                .append(String.format("%-6s\t\t\t\t\t\t  %,6d%n", "내실돈", receipt.getPaidAmount()));
+                .append(String.format(ReceiptFormat.TOTAL_PRICE.getFormat(), "총구매액", receipt.totalQuantity(),
+                        receipt.totalPrice()))
+                .append(String.format(ReceiptFormat.PROMOTION_DISCOUNT.getFormat(), "행사할인",
+                        receipt.promotionDiscount()))
+                .append(String.format(ReceiptFormat.MEMBERSHIP_DISCOUNT.getFormat(), "멤버십할인",
+                        receipt.memberShipDiscount()))
+                .append(String.format(ReceiptFormat.PAID_AMOUNT.getFormat(), "내실돈", receipt.getPaidAmount()));
         return priceInformation.toString();
     }
 
