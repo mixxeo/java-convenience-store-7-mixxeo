@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.stream.Collectors;
 import store.dto.CatalogEntry;
 import store.dto.ProductBuilder;
@@ -31,7 +32,7 @@ public class ProductService {
     }
 
     private Map<String, Promotion> loadPromotions() {
-        List<String> promotionsData = loadData(PROMOTION_RESOURCE_PATH);
+        Queue<String> promotionsData = loadData(PROMOTION_RESOURCE_PATH);
         Map<String, Promotion> promotions = new HashMap<>();
         promotionsData.stream()
                 .map(this::parseData)
@@ -42,15 +43,15 @@ public class ProductService {
     }
 
     private LinkedHashMap<String, List<ProductFields>> loadProductData() {
-        List<String> productsData = loadData(PRODUCT_RESOURCE_PATH);
+        Queue<String> productsData = loadData(PRODUCT_RESOURCE_PATH);
         return productsData.stream()
                 .map(this::parseData)
                 .map(ProductFields::from)
                 .collect(Collectors.groupingBy(ProductFields::name, LinkedHashMap::new, Collectors.toList()));
     }
 
-    private List<String> loadData(final String filePath) {
-        List<String> fileContent = FileManager.read(filePath);
+    private Queue<String> loadData(final String filePath) {
+        Queue<String> fileContent = FileManager.read(filePath);
         FileManager.removeHeader(fileContent);
         return fileContent;
     }
