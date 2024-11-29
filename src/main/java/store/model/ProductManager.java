@@ -47,7 +47,7 @@ public class ProductManager {
     }
 
     public void validateStockAvailability(final Product product, final Quantity quantity, final LocalDate date) {
-        if (stockManager.isInSufficientStock(product, quantity, date)) {
+        if (stockManager.isInsufficientStock(product, quantity, date)) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_MORE_THAN_STOCK_COUNT.getMessage());
         }
     }
@@ -59,8 +59,8 @@ public class ProductManager {
         return null;
     }
 
-    public int getInSufficientPromotionStock(final Product product, final Quantity quantity) {
-        return stockManager.calculateInSufficientPromotionStock(product, quantity);
+    public int getInsufficientPromotionStock(final Product product, final Quantity quantity) {
+        return stockManager.calculateInsufficientPromotionStock(product, quantity);
     }
 
     public int getPromotionFreeQuantity(final Product product, final Quantity quantity) {

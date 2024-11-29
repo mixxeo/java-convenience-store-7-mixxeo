@@ -13,7 +13,7 @@ public class StockManager {
         promotionStock.put(product, promotionStockCount);
     }
 
-    public boolean isInSufficientStock(final Product product, final Quantity quantity, final LocalDate date) {
+    public boolean isInsufficientStock(final Product product, final Quantity quantity, final LocalDate date) {
         int totalStockCount = getNormalStock(product);
         if (product.hasInProgressPromotion(date)) {
             totalStockCount += getPromotionStock(product);
@@ -21,7 +21,7 @@ public class StockManager {
         return quantity.value() > totalStockCount;
     }
 
-    public int calculateInSufficientPromotionStock(final Product product, final Quantity quantity) {
+    public int calculateInsufficientPromotionStock(final Product product, final Quantity quantity) {
         int maxAvailablePromotionStock = getMaxAvailablePromotionStock(product);
         return Integer.max(quantity.value() - maxAvailablePromotionStock, 0);
     }

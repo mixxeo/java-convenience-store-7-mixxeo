@@ -87,7 +87,7 @@ public class StoreController {
     }
 
     private void confirmPromotionStock(Product product, OrderItem orderItem, ProductManager productManager) {
-        int inSufficientStock = productManager.getInSufficientPromotionStock(product, orderItem.getQuantity());
+        int inSufficientStock = productManager.getInsufficientPromotionStock(product, orderItem.getQuantity());
         if (inSufficientStock > 0) {
             ResponseType response = notifyFullPriceQuantity(product.name(), inSufficientStock);
             if (response.equals(ResponseType.NO)) {

@@ -34,14 +34,14 @@ public class StockManagerTest {
     @DisplayName("구매 수량이 재고보다 많으면 재고 부족 여부 true를 반환한다.")
     void testReturnTrueIfQuantityIsMoreThanStock() {
         Quantity quantity = Quantity.from("20");
-        assertThat(stockManager.isInSufficientStock(product1, quantity, DateTimes.now().toLocalDate())).isTrue();
+        assertThat(stockManager.isInsufficientStock(product1, quantity, DateTimes.now().toLocalDate())).isTrue();
     }
 
     @Test
     @DisplayName("구매 수량이 재고보다 적으면 재고 부족 여부 false를 반환한다.")
     void testReturnFalseIfQuantityIsLessThanStock() {
         Quantity quantity = Quantity.from("1");
-        assertThat(stockManager.isInSufficientStock(product1, quantity, DateTimes.now().toLocalDate())).isFalse();
+        assertThat(stockManager.isInsufficientStock(product1, quantity, DateTimes.now().toLocalDate())).isFalse();
     }
 
 
@@ -49,7 +49,7 @@ public class StockManagerTest {
     @DisplayName("부족한 프로모션 재고 수량을 계산한다.")
     void testCalculateInSufficientPromotionStock() {
         Quantity quantity = Quantity.from("15");
-        assertThat(stockManager.calculateInSufficientPromotionStock(product2, quantity)).isEqualTo(5);
+        assertThat(stockManager.calculateInsufficientPromotionStock(product2, quantity)).isEqualTo(5);
     }
 
     @Test
