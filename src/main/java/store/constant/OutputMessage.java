@@ -28,9 +28,10 @@ public enum OutputMessage {
         for (Object arg : args) {
             if (arg instanceof Integer) {
                 arguments.add(DECIMAL_POINT_FORMAT.format(arg));
+                continue;
             }
             arguments.add(String.valueOf(arg));
         }
-        return String.format(message, arguments);
+        return String.format(message, arguments.toArray());
     }
 }
