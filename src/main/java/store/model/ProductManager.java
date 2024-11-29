@@ -1,6 +1,7 @@
 package store.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import store.constant.ExceptionMessage;
 
@@ -14,7 +15,7 @@ public class ProductManager {
     }
 
     public List<Product> getProducts() {
-        return this.products;
+        return new ArrayList<>(this.products);
     }
 
     public int getNormalStock(final Product product) {
