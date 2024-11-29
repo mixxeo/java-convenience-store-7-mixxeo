@@ -1,7 +1,6 @@
 package store.controller;
 
 import java.util.List;
-import store.constant.ResponseType;
 import store.dto.CatalogEntry;
 import store.dto.Receipt;
 import store.model.Order;
@@ -71,8 +70,8 @@ public class StoreController {
 
     private void informPromotionBenefits(List<OrderItem> eligibleOrderItemsForPromotion) {
         for (OrderItem orderItem : eligibleOrderItemsForPromotion) {
-            ResponseType response = suggestPromotionBenefit(orderItem);
-            if (response.equals(ResponseType.YES)) {
+            boolean confirm = suggestPromotionBenefit(orderItem);
+            if (confirm) {
                 orderItem.increaseQuantity(PROMOTION_BENEFIT_QUANTITY);
             }
         }
@@ -89,27 +88,27 @@ public class StoreController {
     private void confirmPromotionStock(Product product, OrderItem orderItem, ProductManager productManager) {
         int inSufficientStock = productManager.getInsufficientPromotionStock(product, orderItem.getQuantity());
         if (inSufficientStock > 0) {
-            ResponseType response = notifyFullPriceQuantity(product.name(), inSufficientStock);
-            if (response.equals(ResponseType.NO)) {
+            boolean confirm = notifyFullPriceQuantity(product.name(), inSufficientStock);
+            if (!confirm) {
                 orderItem.decreaseQuantity(inSufficientStock);
             }
         }
     }
 
-    private ResponseType suggestPromotionBenefit(final OrderItem orderItem) {
+    private boolean suggestPromotionBenefit(final OrderItem orderItem) {
         outputView.printSuggestPromotionBenefit(orderItem.getProductName());
-        return getYesOrNoResponse();
+        return requestWithRetry(inputView::readBoolean);
     }
 
-    private ResponseType notifyFullPriceQuantity(final String productName, final int quantity) {
+    private boolean notifyFullPriceQuantity(final String productName, final int quantity) {
         outputView.printFullPriceQuantityNotification(productName, quantity);
-        return getYesOrNoResponse();
+        return requestWithRetry(inputView::readBoolean);
+
     }
 
     private boolean confirmMembershipDiscount() {
         outputView.printConfirmMembershipDiscount();
-        ResponseType response = getYesOrNoResponse();
-        return response.equals(ResponseType.YES);
+        return requestWithRetry(inputView::readBoolean);
     }
 
     private void displayReceipt(final Order order, final boolean isMembership) {
@@ -119,17 +118,10 @@ public class StoreController {
 
     private void suggestReorder(final ProductManager productManager) {
         outputView.printSuggestReorder();
-        ResponseType response = getYesOrNoResponse();
-        if (response.equals(ResponseType.YES)) {
+        boolean confirm = requestWithRetry(inputView::readBoolean);
+        if (confirm) {
             processOrder(productManager);
         }
-    }
-
-    private ResponseType getYesOrNoResponse() {
-        return requestWithRetry(() -> {
-            String response = inputView.read();
-            return ResponseType.fromString(response);
-        });
     }
 
     private <T> T requestWithRetry(SupplierWithException<T> request) {
