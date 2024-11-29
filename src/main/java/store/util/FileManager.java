@@ -17,14 +17,9 @@ public class FileManager {
     }
 
     private static List<String> readLines(final String path) throws IOException {
-        List<String> lines = new ArrayList<>();
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                lines.add(line);
-            }
+            return bufferedReader.lines().toList();
         }
-        return lines;
     }
 
     public static void removeHeader(final List<String> fileContents) {
