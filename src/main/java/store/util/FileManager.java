@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import store.constant.ExceptionMessage;
 
 public class FileManager {
@@ -18,7 +19,7 @@ public class FileManager {
 
     private static List<String> readLines(final String path) throws IOException {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
-            return bufferedReader.lines().toList();
+            return bufferedReader.lines().collect(Collectors.toList());
         }
     }
 
