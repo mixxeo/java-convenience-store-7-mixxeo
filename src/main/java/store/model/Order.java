@@ -1,5 +1,6 @@
 package store.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 import store.constant.ExceptionMessage;
 
@@ -63,7 +64,7 @@ public record Order(List<OrderItem> items) {
                 .map(OrderItem::calculatePrice)
                 .toList();
         int totalNotPromotionPrice = sum(notPromotionItemPrices);
-        int discount = (int) Math.floor(totalNotPromotionPrice * MEMBERSHIP_DISCOUNT_RATE);
+        int discount = BigDecimal.valueOf(totalNotPromotionPrice * MEMBERSHIP_DISCOUNT_RATE).intValue();
         return Integer.min(discount, MAX_MEMBERSHIP_DISCOUNT);
     }
 
