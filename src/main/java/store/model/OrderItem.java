@@ -17,17 +17,10 @@ public class OrderItem {
     }
 
     public static OrderItem of(
-            final String productName,
+            final Product product,
             final Quantity quantity,
-            final ProductManager productManager
+            final Promotion promotion
     ) {
-        LocalDate now = DateTimes.now().toLocalDate();
-
-        productManager.validateHasProduct(productName);
-        Product product = productManager.findByName(productName);
-        productManager.validateStockAvailability(product, quantity, now);
-        Promotion promotion = productManager.getInProgressPromotionOfProduct(product, now);
-
         return new OrderItem(product, quantity, promotion);
     }
 

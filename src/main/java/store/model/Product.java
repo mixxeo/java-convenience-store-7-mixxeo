@@ -12,6 +12,13 @@ public record Product(String name, int price, Promotion promotion) {
         return promotion != null;
     }
 
+    public Promotion getInProgressPromotion(final LocalDate date) {
+        if (hasInProgressPromotion(date)) {
+            return promotion;
+        }
+        return null;
+    }
+
     public boolean hasInProgressPromotion(final LocalDate now) {
         if (!hasPromotion()) {
             return false;

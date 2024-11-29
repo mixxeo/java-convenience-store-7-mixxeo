@@ -1,5 +1,6 @@
 package store.model;
 
+import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,13 @@ public class ProductManager {
         }
     }
 
-    public void validateHasProduct(final String name) {
+    public void validateStock(final String name, final Quantity quantity, LocalDate date) {
+        validateHasProduct(name);
+        Product product = findByName(name);
+        validateStockAvailability(product, quantity, date);
+    }
+
+    private void validateHasProduct(final String name) {
         if (findByName(name) == null) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_NOT_EXISTING_PRODUCT.getMessage());
         }
@@ -46,17 +53,10 @@ public class ProductManager {
                 .orElse(null);
     }
 
-    public void validateStockAvailability(final Product product, final Quantity quantity, final LocalDate date) {
+    private void validateStockAvailability(final Product product, final Quantity quantity, final LocalDate date) {
         if (stockManager.isInsufficientStock(product, quantity, date)) {
             throw new IllegalArgumentException(ExceptionMessage.ORDER_MORE_THAN_STOCK_COUNT.getMessage());
         }
-    }
-
-    public Promotion getInProgressPromotionOfProduct(final Product product, final LocalDate date) {
-        if (product.hasInProgressPromotion(date)) {
-            return product.promotion();
-        }
-        return null;
     }
 
     public int getInsufficientPromotionStock(final Product product, final Quantity quantity) {

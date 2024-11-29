@@ -60,7 +60,7 @@ public class StoreController {
         outputView.printRequestOrder();
         return requestWithRetry(() -> {
             String orderInput = inputView.read();
-            return orderService.createOrder(orderInput, productManager);
+            return orderService.order(orderInput, productManager);
         });
     }
 
