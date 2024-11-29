@@ -77,6 +77,11 @@ public class StoreController {
         }
     }
 
+    private boolean suggestPromotionBenefit(final OrderItem orderItem) {
+        outputView.printSuggestPromotionBenefit(orderItem.getProductName());
+        return requestWithRetry(inputView::readBoolean);
+    }
+
     private void applyPromotions(List<OrderItem> promotionOrderItems, ProductManager productManager) {
         for (OrderItem orderItem : promotionOrderItems) {
             Product product = orderItem.getProduct();
@@ -95,15 +100,9 @@ public class StoreController {
         }
     }
 
-    private boolean suggestPromotionBenefit(final OrderItem orderItem) {
-        outputView.printSuggestPromotionBenefit(orderItem.getProductName());
-        return requestWithRetry(inputView::readBoolean);
-    }
-
     private boolean notifyFullPriceQuantity(final String productName, final int quantity) {
         outputView.printFullPriceQuantityNotification(productName, quantity);
         return requestWithRetry(inputView::readBoolean);
-
     }
 
     private boolean confirmMembershipDiscount() {

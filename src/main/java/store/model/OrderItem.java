@@ -1,8 +1,5 @@
 package store.model;
 
-import camp.nextstep.edu.missionutils.DateTimes;
-import java.time.LocalDate;
-
 public class OrderItem {
     private final Product product;
     private Quantity quantity;

@@ -12,7 +12,6 @@ import store.model.Order;
 import store.model.OrderItem;
 import store.model.Product;
 import store.model.ProductManager;
-import store.model.Promotion;
 import store.model.Quantity;
 
 public class OrderService {
