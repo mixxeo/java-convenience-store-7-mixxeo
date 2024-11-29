@@ -9,16 +9,17 @@ import store.dto.Receipt;
 import store.dto.ReceiptEntry;
 
 public class OutputView {
+    private static final String LINE_SEPARATOR = System.lineSeparator();
+
     public void printProductCatalog(final List<CatalogEntry> productInformation) {
         printWelcomeMessage();
         String catalog = productInformation.stream()
                 .map(this::buildProductMessage)
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.joining(LINE_SEPARATOR));
         System.out.println(catalog);
     }
 
     private void printWelcomeMessage() {
-        System.out.println();
         System.out.println(OutputMessage.WELCOME_MESSAGE.getMessage());
     }
 
@@ -29,36 +30,31 @@ public class OutputView {
         String promotionName = catalogEntry.promotionName();
 
         if (promotionName == null) {
-            return String.format(OutputMessage.PRODUCT_FORMAT.getMessage(), name, price, stockCount);
+            return OutputMessage.PRODUCT_ENTRY.getMessage(name, price, stockCount);
         }
-        return String.format(OutputMessage.PROMOTION_PRODUCT_FORMAT.getMessage(), name, price, stockCount,
-                promotionName);
+        return OutputMessage.PROMOTION_PRODUCT_ENTRY.getMessage(name, price, stockCount, promotionName);
     }
 
     private String formatProductStockCount(final int stockCount) {
         if (stockCount == 0) {
             return OutputMessage.OUT_OF_STOCK.getMessage();
         }
-        return String.format(OutputMessage.PRODUCT_STOCK_COUNT_FORMAT.getMessage(), stockCount);
+        return OutputMessage.PRODUCT_STOCK_COUNT.getMessage(stockCount);
     }
 
     public void printRequestOrder() {
-        System.out.println();
         System.out.println(OutputMessage.ORDER_REQUEST_MESSAGE.getMessage());
     }
 
     public void printSuggestPromotionBenefit(final String productName) {
-        System.out.println();
-        System.out.printf(OutputMessage.PROMOTION_BENEFIT_SUGGESTION_FORMAT.getMessage(), productName);
+        System.out.println(OutputMessage.PROMOTION_BENEFIT_SUGGESTION.getMessage(productName));
     }
 
     public void printFullPriceQuantityNotification(final String productName, final int quantity) {
-        System.out.println();
-        System.out.printf(OutputMessage.FULL_PRICE_QUANTITY_NOTIFICATION_FORMAT.getMessage(), productName, quantity);
+        System.out.println(OutputMessage.FULL_PRICE_QUANTITY_NOTIFICATION.getMessage(productName, quantity));
     }
 
     public void printConfirmMembershipDiscount() {
-        System.out.println();
         System.out.println(OutputMessage.MEMBERSHIP_DISCOUNT_SUGGESTION.getMessage());
     }
 
@@ -114,7 +110,6 @@ public class OutputView {
     }
 
     public void printSuggestReorder() {
-        System.out.println();
         System.out.println(OutputMessage.REORDER_SUGGESTION.getMessage());
     }
 
